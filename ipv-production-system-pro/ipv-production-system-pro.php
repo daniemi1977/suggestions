@@ -140,7 +140,7 @@ class IPV_Production_System_Pro {
             'ipv_pro_youtube_api_key' => '',
             'ipv_pro_supadata_api_key' => '',
             'ipv_pro_openai_api_key' => '',
-            'ipv_pro_openai_model' => 'gpt-4-turbo-preview',
+            'ipv_pro_openai_model' => 'gpt-4o-mini',
             'ipv_pro_transcript_mode' => 'auto',
             'ipv_pro_transcript_timeout' => 300,
             'ipv_pro_max_retry' => 3,
