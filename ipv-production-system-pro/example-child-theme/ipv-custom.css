@@ -1,0 +1,295 @@
+/**
+ * IPV Custom Styles - Influencer Theme
+ * File opzionale per personalizzazioni avanzate
+ *
+ * Questo file viene caricato solo se il plugin IPV è attivo
+ * Usa questo file per personalizzazioni specifiche senza modificare style.css
+ */
+
+/* ========================================
+   PERSONALIZZAZIONI AVANZATE
+   ======================================== */
+
+/* Esempio: Personalizza colore hover sui link video */
+.ipv-video-title a:hover {
+    color: var(--ipv-primary-color);
+    transition: color 0.3s ease;
+}
+
+/* Esempio: Aggiungi ombra personalizzata alle card */
+.ipv-video-card {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+}
+
+.ipv-video-card:hover {
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+}
+
+/* ========================================
+   INTEGRAZIONE CON EFFETTI TEMA INFLUENCER
+   ======================================== */
+
+/* Compatibilità con orbit circle effect */
+.bt-orbit-enable .ipv-video-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Compatibilità con background pattern */
+.bt-bg-pattern-enable .ipv-video-post {
+    background: inherit;
+}
+
+/* Compatibilità con image zoom effect */
+.bt-img-zoom-enable .ipv-video-thumb img {
+    transition: transform 0.6s ease;
+}
+
+.bt-img-zoom-enable .ipv-video-card:hover .ipv-video-thumb img {
+    transform: scale(1.1);
+}
+
+/* ========================================
+   PERSONALIZZAZIONI WIDGET
+   ======================================== */
+
+/* Stile widget sidebar video */
+.widget.ipv-widget {
+    border-left: 3px solid var(--ipv-primary-color);
+}
+
+.widget.ipv-widget .wg-title {
+    color: var(--ipv-primary-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 14px;
+}
+
+/* ========================================
+   ANIMAZIONI PERSONALIZZATE
+   ======================================== */
+
+/* Animazione fade-in per video cards */
+@keyframes ipv-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ipv-video-card {
+    animation: ipv-fade-in 0.5s ease-out;
+}
+
+/* Delay progressivo per griglia */
+.ipv-video-grid .ipv-video-card:nth-child(1) { animation-delay: 0s; }
+.ipv-video-grid .ipv-video-card:nth-child(2) { animation-delay: 0.1s; }
+.ipv-video-grid .ipv-video-card:nth-child(3) { animation-delay: 0.2s; }
+.ipv-video-grid .ipv-video-card:nth-child(4) { animation-delay: 0.3s; }
+.ipv-video-grid .ipv-video-card:nth-child(5) { animation-delay: 0.4s; }
+.ipv-video-grid .ipv-video-card:nth-child(6) { animation-delay: 0.5s; }
+
+/* ========================================
+   BADGE E ETICHETTE
+   ======================================== */
+
+/* Badge "Nuovo" per video recenti */
+.ipv-video-card.is-new::before {
+    content: "NUOVO";
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #ff4757;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    z-index: 10;
+}
+
+/* Badge durata video */
+.ipv-duration-badge {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    font-weight: 600;
+}
+
+/* ========================================
+   BOTTONI E CALL-TO-ACTION
+   ======================================== */
+
+/* Stile bottone personalizzato */
+.ipv-cta-button {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, var(--ipv-primary-color) 0%, var(--ipv-secondary-color) 100%);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.ipv-cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    color: #fff;
+}
+
+/* ========================================
+   COMPATIBILITÀ WOOCOMMERCE
+   ======================================== */
+
+/* Se WooCommerce è attivo, assicura che gli stili non vadano in conflitto */
+.woocommerce .ipv-video-grid {
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.woocommerce-page .ipv-video-card {
+    /* Mantieni separazione dagli elementi shop */
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+/* Focus visibile per navigazione tastiera */
+.ipv-video-card:focus-within,
+.ipv-video-title a:focus {
+    outline: 3px solid var(--ipv-primary-color);
+    outline-offset: 3px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .ipv-video-meta {
+        border: 2px solid currentColor;
+    }
+
+    .ipv-video-card {
+        border: 2px solid currentColor;
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .ipv-video-meta,
+    .ipv-video-stats {
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+
+    .ipv-video-grid {
+        display: block;
+    }
+
+    .ipv-video-card {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+}
+
+/* ========================================
+   DARK MODE ENHANCEMENTS
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    .ipv-video-card {
+        background: #1e1e1e;
+        border-color: #333;
+    }
+
+    .ipv-video-meta {
+        background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    }
+
+    .ipv-meta-item {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* ========================================
+   RESPONSIVE ENHANCEMENTS
+   ======================================== */
+
+/* Ottimizzazioni specifiche per tablet */
+@media (min-width: 768px) and (max-width: 991px) {
+    .ipv-video-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* Ottimizzazioni per schermi molto piccoli */
+@media (max-width: 480px) {
+    .ipv-video-meta {
+        padding: 15px;
+        font-size: 12px;
+    }
+
+    .ipv-meta-item {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .ipv-video-title {
+        font-size: 16px;
+    }
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+/* Usa will-change per animazioni performanti */
+.ipv-video-card {
+    will-change: transform, box-shadow;
+}
+
+/* GPU acceleration per transizioni */
+.ipv-video-thumb img {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* ========================================
+   PERSONALIZZAZIONI UTENTE
+   ======================================== */
+
+/*
+ * Aggiungi qui le tue personalizzazioni CSS
+ * Questo file non verrà sovrascritto durante gli aggiornamenti
+ */
+
+/* Esempio: cambia colore primario
+:root {
+    --ipv-primary-color: #your-color;
+}
+*/
+
+/* Esempio: personalizza font size
+.ipv-video-title {
+    font-size: 20px;
+}
+*/
+
+/* Esempio: modifica spaziatura grid
+.ipv-video-grid {
+    gap: 40px;
+}
+*/

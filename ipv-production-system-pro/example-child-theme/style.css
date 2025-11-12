@@ -21,6 +21,23 @@ Text Domain: influencer-child-ipv
    PERSONALIZZAZIONI IPV
    ======================================== */
 
+/* Font Compatibility - Usa i font del tema Influencer */
+.ipv-video-title,
+.ipv-video-title a,
+.wg-title,
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.ipv-video-excerpt,
+.ipv-video-info,
+.ipv-meta-item,
+.ipv-widget-title,
+body,
+p {
+    font-family: 'Muli', sans-serif !important;
+}
+
 /* Container Video Post */
 .single-post.ipv-video-post .entry-content {
     max-width: 100%;
@@ -83,7 +100,23 @@ Text Domain: influencer-child-ipv
     border-bottom: 2px solid var(--ipv-primary-color);
 }
 
-/* Responsive Adjustments */
+/* Responsive Adjustments - Compatibilità tema Influencer (breakpoint 991px) */
+@media (max-width: 991px) {
+    .influencer-theme .ipv-video-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .influencer-theme .ipv-video-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .influencer-theme .ipv-video-card {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
 @media (max-width: 768px) {
     .single-post.ipv-video-post .ipv-video-container {
         margin: 20px -15px;

@@ -11,14 +11,17 @@ if (!defined('ABSPATH')) {
 
 /**
  * Enqueue parent and child theme styles
+ * Follows Influencer theme structure: main.css → style.css → child style.css
  */
-add_action('wp_enqueue_scripts', 'influencer_child_ipv_enqueue_styles');
+add_action('wp_enqueue_scripts', 'influencer_child_ipv_enqueue_styles', 20);
 function influencer_child_ipv_enqueue_styles() {
-    // Parent theme style
-    wp_enqueue_style('influencer-parent', get_template_directory_uri() . '/style.css', [], wp_get_theme()->parent()->get('Version'));
+    // Child theme style (loaded after parent main.css and style.css)
+    wp_enqueue_style('influencer-child', get_stylesheet_uri(), ['influencers-style'], wp_get_theme()->get('Version'));
 
-    // Child theme style
-    wp_enqueue_style('influencer-child', get_stylesheet_uri(), ['influencer-parent'], wp_get_theme()->get('Version'));
+    // IPV frontend styles (if plugin active)
+    if (class_exists('IPV_Production_System_Pro')) {
+        wp_enqueue_style('ipv-child-custom', get_stylesheet_directory_uri() . '/ipv-custom.css', ['influencer-child'], '1.0.0');
+    }
 }
 
 /**
@@ -186,17 +189,18 @@ function influencer_add_video_schema() {
 
 /**
  * Registra sidebar custom per video
+ * Usa lo stesso formato del tema Influencer parent
  */
-add_action('widgets_init', 'influencer_register_video_sidebar');
+add_action('widgets_init', 'influencer_register_video_sidebar', 11);
 function influencer_register_video_sidebar() {
     register_sidebar([
-        'name' => 'Video Sidebar Influencer',
+        'name' => esc_html__('Video Sidebar Influencer', 'influencers'),
         'id' => 'influencer-video-sidebar',
-        'description' => 'Sidebar personalizzata per pagine video IPV',
-        'before_widget' => '<div id="%1$s" class="widget ipv-widget %2$s">',
+        'description' => esc_html__('Sidebar personalizzata per pagine video IPV', 'influencers'),
+        'before_widget' => '<div id="%1$s" class="widget %2$s">',
         'after_widget' => '</div>',
-        'before_title' => '<h3 class="widget-title">',
-        'after_title' => '</h3>',
+        'before_title' => '<h4 class="wg-title">',
+        'after_title' => '</h4>',
     ]);
 }
 
@@ -404,16 +408,148 @@ function influencer_add_lazy_load($attr, $attachment) {
 }
 
 /**
+ * Integrazione ACF Options (se ACF disponibile)
+ * Il tema Influencer usa ACF per le opzioni
+ */
+if (function_exists('get_field')) {
+    /**
+     * Usa colori brand da ACF options se disponibili
+     */
+    add_action('wp_head', 'influencer_ipv_custom_colors_from_acf');
+    function influencer_ipv_custom_colors_from_acf() {
+        // Esempio: se hai colori brand in ACF options del tema Influencer
+        // $primary_color = get_field('primary_color', 'options');
+        // Se presenti, sovrascrivi colori IPV
+        ?>
+        <style id="influencer-ipv-acf-colors">
+            /* Colori personalizzati da ACF se necessario */
+        </style>
+        <?php
+    }
+}
+
+/**
+ * Compatibilità con font del tema Influencer
+ * Il tema parent usa Muli (base) e Montserrat (heading)
+ */
+add_action('wp_enqueue_scripts', 'influencer_ipv_ensure_fonts', 25);
+function influencer_ipv_ensure_fonts() {
+    // I font sono già caricati dal parent, assicuriamoci che siano utilizzati
+    wp_add_inline_style('influencer-child', '
+        .ipv-video-title,
+        .ipv-video-title a {
+            font-family: "Montserrat", sans-serif;
+        }
+        .ipv-video-excerpt,
+        .ipv-video-info,
+        .ipv-meta-item {
+            font-family: "Muli", sans-serif;
+        }
+    ');
+}
+
+/**
+ * Compatibilità con effetti del tema Influencer
+ * Il parent theme supporta: orbit circle, bg pattern, bg buble, bg scroll, img zoom
+ */
+add_filter('body_class', 'influencer_ipv_effect_classes', 20);
+function influencer_ipv_effect_classes($classes) {
+    // Aggiungi classe per compatibilità effetti su post video
+    if (is_single() && get_post_meta(get_the_ID(), '_ipv_video_id', true)) {
+        // Mantieni compatibilità con effetti tema parent
+        if (function_exists('get_field')) {
+            $img_zoom = get_field('effect_img_zoom', 'options');
+            if ($img_zoom && !in_array('bt-img-zoom-enable', $classes)) {
+                $classes[] = 'bt-img-zoom-enable';
+            }
+        }
+    }
+    return $classes;
+}
+
+/**
+ * Integrazione con Custom Post Types del tema Influencer
+ * Parent supporta: service, team, testimonial, podcast, client, pricing
+ */
+add_action('init', 'influencer_ipv_cpt_integration', 20);
+function influencer_ipv_cpt_integration() {
+    // Opzionale: aggiungi supporto video anche per CPT del tema
+    // Esempio: se vuoi che i "podcast" possano avere video IPV
+    // add_post_type_support('podcast', 'ipv-video');
+}
+
+/**
+ * Compatibilità con WooCommerce (se attivo)
+ * Il tema Influencer ha supporto WooCommerce integrato
+ */
+if (class_exists('Woocommerce')) {
+    /**
+     * Non caricare IPV assets su pagine shop
+     */
+    add_action('wp_enqueue_scripts', 'influencer_ipv_woo_compatibility', 30);
+    function influencer_ipv_woo_compatibility() {
+        if (is_shop() || is_product_category() || is_product_tag()) {
+            // Rimuovi assets IPV non necessari su pagine shop
+            wp_dequeue_style('ipv-child-custom');
+        }
+    }
+}
+
+/**
+ * Integrazione con sistema di ricerca del tema
+ * Il parent theme ha filtro ricerca per CPT "team"
+ */
+add_filter('pre_get_posts', 'influencer_ipv_search_integration', 25);
+function influencer_ipv_search_integration($query) {
+    if (!is_admin() && $query->is_main_query() && $query->is_search()) {
+        // Aggiungi post con video IPV ai risultati di ricerca
+        $post_types = $query->get('post_type');
+        if (empty($post_types)) {
+            $post_types = ['post', 'team'];
+        } elseif (is_string($post_types)) {
+            $post_types = [$post_types];
+        }
+
+        // Assicurati che "post" sia incluso (per video IPV)
+        if (!in_array('post', $post_types)) {
+            $post_types[] = 'post';
+        }
+
+        $query->set('post_type', $post_types);
+    }
+}
+
+/**
+ * Mobile responsive: usa la stessa breakpoint del tema parent
+ * Il tema Influencer usa 991px come mobile_width
+ */
+add_action('wp_head', 'influencer_ipv_mobile_breakpoint');
+function influencer_ipv_mobile_breakpoint() {
+    ?>
+    <style id="influencer-ipv-mobile-compat">
+        @media (max-width: 991px) {
+            .ipv-video-grid {
+                grid-template-columns: 1fr;
+            }
+            .ipv-video-meta {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <?php
+}
+
+/**
  * Debug: Log importazione video (solo in development)
  */
 if (defined('WP_DEBUG') && WP_DEBUG) {
     add_action('ipv_pro_before_video_processing', 'influencer_debug_video_import', 10, 2);
     function influencer_debug_video_import($post_id, $video_url) {
-        error_log('IPV: Inizio elaborazione video - Post ID: ' . $post_id . ', URL: ' . $video_url);
+        error_log('IPV Influencer Child: Inizio elaborazione video - Post ID: ' . $post_id . ', URL: ' . $video_url);
     }
 
     add_action('ipv_pro_after_video_processing', 'influencer_debug_video_complete', 10, 2);
     function influencer_debug_video_complete($post_id, $video_data) {
-        error_log('IPV: Elaborazione completata - Post ID: ' . $post_id);
+        error_log('IPV Influencer Child: Elaborazione completata - Post ID: ' . $post_id);
     }
 }
