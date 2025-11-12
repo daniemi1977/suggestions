@@ -1,0 +1,26 @@
+# WordPress
+*.log
+.htaccess
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Composer
+vendor/
+composer.lock
+
+# Node
+node_modules/
+package-lock.json
+
+# Build
+*.zip
+dist/

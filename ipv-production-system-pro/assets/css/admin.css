@@ -1,0 +1,526 @@
+/**
+ * IPV Production System Pro - Admin Styles
+ * Modern, clean interface for video management
+ */
+
+/* === Global Styles === */
+.ipv-pro-dashboard,
+.ipv-pro-video-manager,
+.ipv-pro-settings {
+    max-width: 1400px;
+    margin: 20px 0;
+}
+
+.ipv-tagline {
+    font-size: 14px;
+    color: #666;
+    margin: 10px 0 30px;
+}
+
+/* === Cards === */
+.ipv-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.ipv-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e1e1e;
+}
+
+.ipv-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3338;
+}
+
+.ipv-card-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.ipv-card-content h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* === Dashboard Grid === */
+.ipv-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* === Stats === */
+.ipv-stats-bar {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.ipv-stat {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    border-right: 1px solid #e0e0e0;
+}
+
+.ipv-stat:last-child {
+    border-right: none;
+}
+
+.ipv-stat-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.ipv-stat-value {
+    display: block;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e1e1e;
+}
+
+.ipv-stat-pending,
+.ipv-text-pending { color: #f0ad4e !important; }
+
+.ipv-stat-processing,
+.ipv-text-processing { color: #5bc0de !important; }
+
+.ipv-stat-completed,
+.ipv-text-completed { color: #5cb85c !important; }
+
+.ipv-stat-failed,
+.ipv-text-failed { color: #d9534f !important; }
+
+.ipv-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+}
+
+.ipv-stat-item {
+    text-align: center;
+}
+
+.ipv-stat-number {
+    display: block;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+/* === Status Badges === */
+.ipv-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ipv-badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.ipv-badge-processing {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.ipv-badge-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.ipv-badge-failed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.ipv-step-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #666;
+}
+
+.ipv-error-tooltip {
+    cursor: help;
+    font-size: 14px;
+}
+
+/* === Filter Tabs === */
+.ipv-filter-tabs {
+    margin: 20px 0;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.ipv-filter-tabs a {
+    display: inline-block;
+    padding: 12px 20px;
+    margin: 0 5px 0 0;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    background: #f9f9f9;
+    color: #666;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.ipv-filter-tabs a:hover {
+    background: #fff;
+    color: #2271b1;
+}
+
+.ipv-filter-tabs a.active {
+    background: #fff;
+    color: #2271b1;
+    font-weight: 600;
+    border-bottom: 2px solid #fff;
+    margin-bottom: -2px;
+}
+
+/* === Tables === */
+.ipv-videos-table,
+.ipv-recent-table {
+    margin-top: 20px;
+}
+
+.ipv-videos-table td,
+.ipv-recent-table td {
+    vertical-align: middle;
+}
+
+.ipv-video-link {
+    color: #2271b1;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.ipv-video-link:hover {
+    text-decoration: underline;
+}
+
+/* === Import Forms === */
+.ipv-import-section {
+    margin: 30px 0;
+}
+
+.ipv-import-form {
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.ipv-form-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.ipv-input-url {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.ipv-input-url:focus {
+    border-color: #2271b1;
+    outline: none;
+}
+
+.ipv-textarea-bulk {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: monospace;
+    resize: vertical;
+    margin-bottom: 10px;
+}
+
+.ipv-textarea-bulk:focus {
+    border-color: #2271b1;
+    outline: none;
+}
+
+.ipv-result-message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: none;
+}
+
+.ipv-result-message.success {
+    display: block;
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.ipv-result-message.error {
+    display: block;
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* === Progress Bar === */
+.ipv-progress-container {
+    margin-top: 15px;
+}
+
+.ipv-progress-bar {
+    width: 100%;
+    height: 24px;
+    background: #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.ipv-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2271b1, #00a0d2);
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ipv-progress-text {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+}
+
+/* === System Status === */
+.ipv-status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ipv-status-list li {
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ipv-status-icon {
+    font-size: 16px;
+}
+
+.ipv-success {
+    color: #155724;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.ipv-warning {
+    color: #856404;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* === Quick Links === */
+.ipv-quick-links {
+    margin: 30px 0;
+}
+
+.ipv-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.ipv-link-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #2c3338;
+    transition: all 0.2s;
+}
+
+.ipv-link-card:hover {
+    border-color: #2271b1;
+    box-shadow: 0 2px 8px rgba(34, 113, 177, 0.15);
+    transform: translateY(-2px);
+}
+
+.ipv-link-icon {
+    font-size: 24px;
+}
+
+.ipv-link-text {
+    font-weight: 600;
+}
+
+/* === Settings === */
+.ipv-settings-section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.ipv-settings-section:last-of-type {
+    border-bottom: none;
+}
+
+.ipv-api-test-result {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    display: none;
+}
+
+.ipv-api-test-result.success {
+    display: block;
+    background: #d4edda;
+    color: #155724;
+}
+
+.ipv-api-test-result.error {
+    display: block;
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.ipv-test-api {
+    margin-left: 10px;
+}
+
+/* === Action Buttons === */
+.ipv-action-retry {
+    background: #f0ad4e;
+    border-color: #eea236;
+    color: #fff;
+}
+
+.ipv-action-retry:hover {
+    background: #ec971f;
+    border-color: #d58512;
+}
+
+.ipv-action-delete {
+    color: #d9534f;
+}
+
+.ipv-action-delete:hover {
+    color: #c9302c;
+}
+
+/* === Empty States === */
+.ipv-empty-state,
+.ipv-empty-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 16px;
+}
+
+/* === Responsive === */
+@media (max-width: 1200px) {
+    .ipv-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ipv-stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 782px) {
+    .ipv-stats-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ipv-stat {
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 15px;
+    }
+
+    .ipv-stat:last-child {
+        border-bottom: none;
+    }
+
+    .ipv-form-group {
+        flex-direction: column;
+    }
+
+    .ipv-input-url {
+        width: 100%;
+    }
+
+    .ipv-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* === Loading Spinner === */
+.ipv-loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(34, 113, 177, 0.3);
+    border-top-color: #2271b1;
+    border-radius: 50%;
+    animation: ipv-spin 0.6s linear infinite;
+    margin-left: 8px;
+}
+
+@keyframes ipv-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* === Utilities === */
+.ipv-text-center { text-align: center; }
+.ipv-text-right { text-align: right; }
+.ipv-mt-20 { margin-top: 20px; }
+.ipv-mb-20 { margin-bottom: 20px; }
