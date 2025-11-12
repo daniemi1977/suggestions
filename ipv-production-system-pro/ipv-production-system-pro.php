@@ -40,6 +40,7 @@ class IPV_Production_System_Pro {
     public $supadata_api;
     public $openai_api;
     public $queue_manager;
+    public $rss_auto_import;
     public $settings;
     public $video_manager;
     public $dashboard;
@@ -74,6 +75,7 @@ class IPV_Production_System_Pro {
         require_once IPV_PRO_INCLUDES_DIR . 'class-supadata-api.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-openai-api.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-queue-manager.php';
+        require_once IPV_PRO_INCLUDES_DIR . 'class-rss-auto-import.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-settings.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-video-manager.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-dashboard.php';
@@ -99,6 +101,7 @@ class IPV_Production_System_Pro {
         $this->supadata_api = new IPV_SupaData_API();
         $this->openai_api = new IPV_OpenAI_API();
         $this->queue_manager = new IPV_Queue_Manager();
+        $this->rss_auto_import = new IPV_RSS_Auto_Import();
         $this->settings = new IPV_Settings();
         $this->video_manager = new IPV_Video_Manager();
         $this->dashboard = new IPV_Dashboard();
@@ -150,7 +153,13 @@ class IPV_Production_System_Pro {
             ],
             'ipv_pro_default_category' => 1,
             'ipv_pro_auto_publish' => false,
-            'ipv_pro_batch_size' => 5
+            'ipv_pro_batch_size' => 5,
+            'ipv_pro_rss_feed_url' => '',
+            'ipv_pro_auto_import_enabled' => false,
+            'ipv_pro_auto_import_interval' => 60,
+            'ipv_pro_auto_import_max_videos' => 10,
+            'ipv_pro_auto_import_email_notifications' => false,
+            'ipv_pro_auto_import_notification_email' => get_option('admin_email')
         ];
 
         foreach ($defaults as $key => $value) {
@@ -163,6 +172,11 @@ class IPV_Production_System_Pro {
         if (!wp_next_scheduled('ipv_pro_process_queue')) {
             wp_schedule_event(time(), 'every_minute', 'ipv_pro_process_queue');
         }
+
+        // Schedule cron for RSS auto-import
+        if (!wp_next_scheduled('ipv_pro_auto_import_check')) {
+            wp_schedule_event(time(), 'hourly', 'ipv_pro_auto_import_check');
+        }
     }
 
     /**
@@ -170,6 +184,7 @@ class IPV_Production_System_Pro {
      */
     public function deactivate() {
         wp_clear_scheduled_hook('ipv_pro_process_queue');
+        wp_clear_scheduled_hook('ipv_pro_auto_import_check');
     }
 
     /**
@@ -276,6 +291,16 @@ add_filter('cron_schedules', function($schedules) {
 add_action('ipv_pro_process_queue', function() {
     $queue_manager = IPV_Production_System_Pro::get_instance()->queue_manager;
     $queue_manager->process_queue();
+});
+
+/**
+ * Hook RSS auto-import to cron
+ */
+add_action('ipv_pro_auto_import_check', function() {
+    $rss_auto_import = IPV_Production_System_Pro::get_instance()->rss_auto_import;
+    if ($rss_auto_import->is_enabled()) {
+        $rss_auto_import->check_and_import();
+    }
 });
 
 /**

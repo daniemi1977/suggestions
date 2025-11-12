@@ -357,6 +357,92 @@
     }
 
     /**
+     * Test RSS feed
+     */
+    $('.ipv-test-rss-feed').on('click', function(e) {
+        e.preventDefault();
+
+        const $btn = $(this);
+        const $result = $('.ipv-rss-test-result');
+        const feedUrl = $('#rss_feed_url').val();
+
+        if (!feedUrl) {
+            showMessage($result, 'error', '⚠️ Inserisci prima l\'URL del feed RSS');
+            return;
+        }
+
+        $btn.prop('disabled', true).text('Test in corso...');
+        $result.html('').hide();
+
+        $.ajax({
+            url: ipvPro.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'ipv_test_rss_feed',
+                nonce: ipvPro.nonce
+            },
+            success: function(response) {
+                $btn.prop('disabled', false).text('Test Feed');
+
+                if (response.success) {
+                    showMessage($result, 'success', '✅ ' + response.data.message);
+                } else {
+                    showMessage($result, 'error', '❌ ' + response.data.message);
+                }
+            },
+            error: function() {
+                $btn.prop('disabled', false).text('Test Feed');
+                showMessage($result, 'error', '❌ Errore di connessione al server');
+            }
+        });
+    });
+
+    /**
+     * Manual import check
+     */
+    $('.ipv-manual-import-check').on('click', function(e) {
+        e.preventDefault();
+
+        const $btn = $(this);
+        const $result = $('.ipv-manual-check-result');
+
+        $btn.prop('disabled', true).text('Controllo in corso...');
+        $result.html('').hide();
+
+        $.ajax({
+            url: ipvPro.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'ipv_manual_import_check',
+                nonce: ipvPro.nonce
+            },
+            success: function(response) {
+                $btn.prop('disabled', false).text('Esegui Controllo Manuale');
+
+                if (response.success) {
+                    const msg = `
+                        <div style="margin-top: 10px; padding: 10px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px;">
+                            <strong>✅ ${response.data.message}</strong><br>
+                            <small>
+                                Video importati: ${response.data.imported} |
+                                Già presenti: ${response.data.skipped} |
+                                Errori: ${response.data.errors}
+                            </small>
+                        </div>
+                    `;
+                    $result.html(msg).show();
+                } else {
+                    showMessage($result, 'error', '❌ ' + response.data.message);
+                }
+            },
+            error: function() {
+                $btn.prop('disabled', false).text('Esegui Controllo Manuale');
+                showMessage($result, 'error', '❌ Errore di connessione al server');
+            }
+        });
+    });
+
+    /**
      * Helper: Show message in result div
      */
     function showMessage($element, type, message) {

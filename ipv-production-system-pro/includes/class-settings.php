@@ -40,6 +40,14 @@ class IPV_Settings {
         // Import Settings
         register_setting('ipv_pro_settings', 'ipv_pro_auto_publish');
         register_setting('ipv_pro_settings', 'ipv_pro_batch_size');
+
+        // RSS Auto-Import Settings
+        register_setting('ipv_pro_settings', 'ipv_pro_rss_feed_url');
+        register_setting('ipv_pro_settings', 'ipv_pro_auto_import_enabled');
+        register_setting('ipv_pro_settings', 'ipv_pro_auto_import_interval');
+        register_setting('ipv_pro_settings', 'ipv_pro_auto_import_max_videos');
+        register_setting('ipv_pro_settings', 'ipv_pro_auto_import_email_notifications');
+        register_setting('ipv_pro_settings', 'ipv_pro_auto_import_notification_email');
     }
 
     /**
@@ -345,6 +353,142 @@ class IPV_Settings {
                     </table>
                 </div>
 
+                <!-- RSS Auto-Import Settings -->
+                <div class="ipv-settings-section">
+                    <h2>📡 RSS Auto-Import</h2>
+                    <p>Configura l'importazione automatica dei nuovi video dal feed RSS del canale YouTube.</p>
+
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="rss_feed_url">RSS Feed URL</label>
+                            </th>
+                            <td>
+                                <input type="url"
+                                       id="rss_feed_url"
+                                       name="ipv_pro_rss_feed_url"
+                                       value="<?php echo esc_attr(get_option('ipv_pro_rss_feed_url')); ?>"
+                                       class="regular-text"
+                                       placeholder="https://www.youtube.com/feeds/videos.xml?channel_id=...">
+                                <button type="button" class="button button-secondary ipv-test-rss-feed">
+                                    Test Feed
+                                </button>
+                                <div class="ipv-rss-test-result"></div>
+                                <p class="description">
+                                    URL del feed RSS/Atom del canale YouTube (formato: https://www.youtube.com/feeds/videos.xml?channel_id=CHANNEL_ID)
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="auto_import_enabled">Abilita Auto-Import</label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox"
+                                           id="auto_import_enabled"
+                                           name="ipv_pro_auto_import_enabled"
+                                           value="1"
+                                           <?php checked(get_option('ipv_pro_auto_import_enabled'), 1); ?>>
+                                    Controlla automaticamente il feed per nuovi video
+                                </label>
+                                <p class="description">
+                                    Il sistema controllerà periodicamente il feed RSS e importerà automaticamente i nuovi video
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="auto_import_interval">Intervallo Controllo</label>
+                            </th>
+                            <td>
+                                <input type="number"
+                                       id="auto_import_interval"
+                                       name="ipv_pro_auto_import_interval"
+                                       value="<?php echo esc_attr(get_option('ipv_pro_auto_import_interval', 60)); ?>"
+                                       min="15"
+                                       max="1440">
+                                <span>minuti</span>
+                                <p class="description">
+                                    Frequenza del controllo feed (minimo 15 minuti, massimo 24 ore)
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="auto_import_max_videos">Max Video per Controllo</label>
+                            </th>
+                            <td>
+                                <input type="number"
+                                       id="auto_import_max_videos"
+                                       name="ipv_pro_auto_import_max_videos"
+                                       value="<?php echo esc_attr(get_option('ipv_pro_auto_import_max_videos', 10)); ?>"
+                                       min="1"
+                                       max="50">
+                                <span>video</span>
+                                <p class="description">
+                                    Numero massimo di nuovi video da importare per ogni controllo
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="auto_import_email_notifications">Notifiche Email</label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox"
+                                           id="auto_import_email_notifications"
+                                           name="ipv_pro_auto_import_email_notifications"
+                                           value="1"
+                                           <?php checked(get_option('ipv_pro_auto_import_email_notifications'), 1); ?>>
+                                    Invia email quando vengono importati nuovi video
+                                </label>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="auto_import_notification_email">Email Notifiche</label>
+                            </th>
+                            <td>
+                                <input type="email"
+                                       id="auto_import_notification_email"
+                                       name="ipv_pro_auto_import_notification_email"
+                                       value="<?php echo esc_attr(get_option('ipv_pro_auto_import_notification_email', get_option('admin_email'))); ?>"
+                                       class="regular-text">
+                                <p class="description">
+                                    Indirizzo email per le notifiche di auto-import
+                                </p>
+                            </td>
+                        </tr>
+
+                        <?php
+                        $rss_auto_import = IPV_Production_System_Pro::get_instance()->rss_auto_import;
+                        $last_check = $rss_auto_import->get_last_check();
+                        $next_check = $rss_auto_import->get_next_check();
+                        ?>
+
+                        <tr>
+                            <th scope="row">Stato Auto-Import</th>
+                            <td>
+                                <p>
+                                    <strong>Ultimo controllo:</strong> <?php echo $last_check ? $last_check : 'Mai eseguito'; ?><br>
+                                    <strong>Prossimo controllo:</strong> <?php echo $next_check; ?>
+                                </p>
+                                <button type="button" class="button button-secondary ipv-manual-import-check">
+                                    Esegui Controllo Manuale
+                                </button>
+                                <div class="ipv-manual-check-result"></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
                 <?php submit_button('Salva Impostazioni', 'primary', 'ipv_pro_save_settings'); ?>
             </form>
         </div>
@@ -404,6 +548,32 @@ class IPV_Settings {
 
         if (isset($_POST['ipv_pro_batch_size'])) {
             update_option('ipv_pro_batch_size', absint($_POST['ipv_pro_batch_size']));
+        }
+
+        // RSS Auto-Import Settings
+        if (isset($_POST['ipv_pro_rss_feed_url'])) {
+            update_option('ipv_pro_rss_feed_url', esc_url_raw($_POST['ipv_pro_rss_feed_url']));
+        }
+
+        update_option('ipv_pro_auto_import_enabled', isset($_POST['ipv_pro_auto_import_enabled']) ? 1 : 0);
+        update_option('ipv_pro_auto_import_email_notifications', isset($_POST['ipv_pro_auto_import_email_notifications']) ? 1 : 0);
+
+        if (isset($_POST['ipv_pro_auto_import_interval'])) {
+            $interval = absint($_POST['ipv_pro_auto_import_interval']);
+            // Clamp between 15 and 1440 minutes
+            $interval = max(15, min(1440, $interval));
+            update_option('ipv_pro_auto_import_interval', $interval);
+        }
+
+        if (isset($_POST['ipv_pro_auto_import_max_videos'])) {
+            $max_videos = absint($_POST['ipv_pro_auto_import_max_videos']);
+            // Clamp between 1 and 50
+            $max_videos = max(1, min(50, $max_videos));
+            update_option('ipv_pro_auto_import_max_videos', $max_videos);
+        }
+
+        if (isset($_POST['ipv_pro_auto_import_notification_email'])) {
+            update_option('ipv_pro_auto_import_notification_email', sanitize_email($_POST['ipv_pro_auto_import_notification_email']));
         }
     }
 }

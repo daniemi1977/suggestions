@@ -29,6 +29,10 @@ class IPV_Ajax_Handlers {
         // Get stats
         add_action('wp_ajax_ipv_get_stats', [$this, 'get_stats']);
         add_action('wp_ajax_ipv_get_queue_status', [$this, 'get_queue_status']);
+
+        // RSS Auto-Import
+        add_action('wp_ajax_ipv_test_rss_feed', [$this, 'test_rss_feed']);
+        add_action('wp_ajax_ipv_manual_import_check', [$this, 'manual_import_check']);
     }
 
     /**
@@ -264,5 +268,48 @@ class IPV_Ajax_Handlers {
             'processing_items' => $processing_items,
             'count' => count($processing_items)
         ]);
+    }
+
+    /**
+     * Test RSS feed connection
+     */
+    public function test_rss_feed() {
+        $this->verify_nonce();
+
+        $rss_auto_import = IPV_Production_System_Pro::get_instance()->rss_auto_import;
+        $result = $rss_auto_import->test_feed();
+
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+
+    /**
+     * Manual import check
+     */
+    public function manual_import_check() {
+        $this->verify_nonce();
+
+        $rss_auto_import = IPV_Production_System_Pro::get_instance()->rss_auto_import;
+        $result = $rss_auto_import->manual_check();
+
+        if ($result['status'] === 'disabled') {
+            wp_send_json_error([
+                'message' => $result['message']
+            ]);
+        } elseif ($result['status'] === 'error') {
+            wp_send_json_error([
+                'message' => $result['message']
+            ]);
+        } else {
+            wp_send_json_success([
+                'message' => $result['message'],
+                'imported' => $result['imported'],
+                'skipped' => $result['skipped'],
+                'errors' => $result['errors']
+            ]);
+        }
     }
 }
