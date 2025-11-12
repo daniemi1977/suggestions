@@ -157,18 +157,12 @@ class IPV_Settings {
                                     <option value="gpt-4o" <?php selected(get_option('ipv_pro_openai_model'), 'gpt-4o'); ?>>
                                         GPT-4o (Qualità Premium)
                                     </option>
-                                    <option value="gpt-4-turbo-preview" <?php selected(get_option('ipv_pro_openai_model'), 'gpt-4-turbo-preview'); ?>>
-                                        GPT-4 Turbo
-                                    </option>
-                                    <option value="gpt-4" <?php selected(get_option('ipv_pro_openai_model'), 'gpt-4'); ?>>
-                                        GPT-4
-                                    </option>
                                     <option value="gpt-3.5-turbo" <?php selected(get_option('ipv_pro_openai_model'), 'gpt-3.5-turbo'); ?>>
                                         GPT-3.5 Turbo (Legacy)
                                     </option>
                                 </select>
                                 <p class="description">
-                                    GPT-4o Mini offre un ottimo rapporto qualità/prezzo per la generazione di contenuti.
+                                    GPT-4o Mini offre un ottimo rapporto qualità/prezzo. GPT-4o per contenuti premium.
                                 </p>
                             </td>
                         </tr>
