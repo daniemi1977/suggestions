@@ -14,7 +14,7 @@ class IPV_SupaData_API {
     /**
      * API endpoints
      */
-    private $api_endpoint = 'https://api.supadata.ai/v1/transcribe';
+    private $api_endpoint = 'https://api.supadata.ai/v1/transcript';
 
     /**
      * Get API key from settings
@@ -86,27 +86,28 @@ class IPV_SupaData_API {
     /**
      * Call SupaData API
      *
-     * @param string $method 'native' or 'generate'
+     * @param string $mode 'native', 'auto' or 'generate'
      * @param string $video_url YouTube video URL
      * @return array|WP_Error API response or error
      */
-    private function call_api($method, $video_url) {
+    private function call_api($mode, $video_url) {
         $api_key = $this->get_api_key();
 
-        $body = [
-            'url' => $video_url,
-            'method' => $method,
-            'language' => 'it'
+        // Build query parameters
+        $query_params = [
+            'url' => urlencode($video_url),
+            'mode' => $mode,
+            'lang' => 'it',
+            'text' => 'true'
         ];
 
-        $response = wp_remote_post($this->api_endpoint, [
+        $url = add_query_arg($query_params, $this->api_endpoint);
+
+        $response = wp_remote_get($url, [
             'timeout' => 60,
             'headers' => [
-                'Authorization' => 'Bearer ' . $api_key,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ],
-            'body' => json_encode($body)
+                'x-api-key' => $api_key
+            ]
         ]);
 
         if (is_wp_error($response)) {
@@ -123,14 +124,14 @@ class IPV_SupaData_API {
                 // Success - transcript ready
                 return [
                     'status' => 200,
-                    'text' => isset($data['transcript']) ? $data['transcript'] : $data['text']
+                    'text' => $data['content'] ?? ''
                 ];
 
             case 202:
                 // Accepted - job queued
                 return [
                     'status' => 202,
-                    'job_id' => $data['job_id'],
+                    'job_id' => $data['jobId'] ?? '',
                     'message' => 'Job in coda'
                 ];
 
@@ -163,14 +164,13 @@ class IPV_SupaData_API {
         $start_time = time();
         $poll_interval = 5; // seconds
 
-        $poll_url = "https://api.supadata.ai/v1/jobs/{$job_id}";
+        $poll_url = "https://api.supadata.ai/v1/transcript/{$job_id}";
 
         while ((time() - $start_time) < $timeout) {
             $response = wp_remote_get($poll_url, [
                 'timeout' => 30,
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $api_key,
-                    'Accept' => 'application/json'
+                    'x-api-key' => $api_key
                 ]
             ]);
 
@@ -186,12 +186,12 @@ class IPV_SupaData_API {
                 if (isset($data['status'])) {
                     switch ($data['status']) {
                         case 'completed':
-                            return $data['transcript'] ?? $data['text'];
+                            return $data['content'] ?? '';
 
                         case 'failed':
                             return new WP_Error('job_failed', 'Job fallito: ' . ($data['error'] ?? 'Errore sconosciuto'));
 
-                        case 'processing':
+                        case 'active':
                         case 'queued':
                             // Continue polling
                             sleep($poll_interval);
