@@ -68,6 +68,8 @@ class IPV_Production_System_Pro {
      * Load required files
      */
     private function load_dependencies() {
+        require_once IPV_PRO_INCLUDES_DIR . 'class-channel-config.php';
+        require_once IPV_PRO_INCLUDES_DIR . 'class-prompt-builder.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-youtube-api.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-supadata-api.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-openai-api.php';

@@ -49,8 +49,14 @@ class IPV_OpenAI_API {
             return new WP_Error('no_transcript', 'Trascrizione vuota');
         }
 
-        // Build the prompt
-        $prompt = $this->build_ultra_strict_prompt($transcript, $video_data);
+        // Build the prompt using dynamic configuration
+        $prompt = IPV_Prompt_Builder::build_prompt($transcript, $video_data);
+
+        // Get channel config for system message
+        $config = IPV_Channel_Config::get_config();
+        $themes_short = is_array($config['channel_themes'])
+            ? implode(', ', array_slice($config['channel_themes'], 0, 3))
+            : $config['channel_themes'];
 
         // Call OpenAI API
         $response = wp_remote_post($this->api_endpoint, [
@@ -64,7 +70,7 @@ class IPV_OpenAI_API {
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'Sei un esperto content writer per "Il Punto di Vista", canale YouTube di Adrian Fiorelli specializzato in spiritualità, esoterismo, misteri e pensiero critico.'
+                        'content' => "Sei un esperto content writer per \"{$config['channel_name']}\", canale YouTube di {$config['channel_owner']} specializzato in {$themes_short}."
                     ],
                     [
                         'role' => 'user',
@@ -100,19 +106,28 @@ class IPV_OpenAI_API {
     }
 
     /**
-     * Build ultra-strict prompt v1.9.4 for "Il Punto di Vista"
-     * Based on official ChatGPT prompt with all specific sections
+     * Build ultra-strict prompt v2.0 - Dynamic Multi-Channel Support
+     * Uses channel configuration for personalization
      */
     private function build_ultra_strict_prompt($transcript, $video_data) {
         $video_title = isset($video_data['title']) ? $video_data['title'] : 'Video';
 
-        $prompt = <<<PROMPT
-# PROMPT ULTRA-RIGOROSO v1.9.4 - Il Punto di Vista
+        // Load channel configuration
+        $config = IPV_Channel_Config::get_config();
 
-Genera una descrizione COMPLETA e PROFESSIONALE per il video YouTube del canale "Il Punto di Vista" di Adrian Fiorelli.
+        // Build dynamic themes list
+        $themes_list = is_array($config['channel_themes'])
+            ? implode("\n", array_map(function($theme) { return "- $theme"; }, $config['channel_themes']))
+            : "- " . $config['channel_themes'];
+
+        $prompt = <<<PROMPT
+# PROMPT ULTRA-RIGOROSO v2.0 - {$config['channel_name']}
+
+Genera una descrizione COMPLETA e PROFESSIONALE per il video YouTube del canale "{$config['channel_name']}" di {$config['channel_owner']}.
 
 ## CONTESTO CANALE
-"Il Punto di Vista" è un canale YouTube dedicato a:
+"{$config['channel_name']}" è un canale YouTube dedicato a:
+{$themes_list}
 - **Esoterismo** – Tradizioni occulte e conoscenze nascoste
 - **Spiritualità** – Ricerca interiore e crescita personale
 - **Misteri** – Enigmi storici e archeologia alternativa
