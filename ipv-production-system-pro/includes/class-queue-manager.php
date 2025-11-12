@@ -326,17 +326,18 @@ class IPV_Queue_Manager {
     }
 
     /**
-     * Save AI generated content
+     * Save AI generated content (v1.9.4 - 18 sections)
      */
     private function save_ai_content($post_id, $ai_content) {
         // Save full AI content
         update_post_meta($post_id, '_ipv_ai_content_full', $ai_content['full_content']);
 
-        // Save individual sections
+        // Save individual sections (v1.9.4)
         $sections = [
-            'title', 'description_short', 'sponsor', 'timestamps', 'topics',
-            'guests', 'quotes', 'references', 'related_themes', 'related_videos',
-            'links', 'social_media', 'useful_links', 'disclaimer', 'hashtags'
+            'title', 'description', 'sponsor', 'timestamps', 'topics',
+            'guests', 'persone_menzionate', 'regia', 'eventi', 'quotes',
+            'references', 'links', 'related_themes', 'related_videos',
+            'donazioni', 'abbonati', 'social_media', 'contatti', 'temi_canale', 'hashtags'
         ];
 
         foreach ($sections as $section) {
@@ -361,7 +362,7 @@ class IPV_Queue_Manager {
             'ID' => $post_id,
             'post_title' => $post_title,
             'post_content' => $content,
-            'post_excerpt' => !empty($ai_content['description_short']) ? $ai_content['description_short'] : ''
+            'post_excerpt' => !empty($ai_content['description']) ? $ai_content['description'] : ''
         ];
 
         // Auto-publish if enabled
@@ -399,8 +400,8 @@ class IPV_Queue_Manager {
         $content .= "<!-- /wp:embed -->\n\n";
 
         // Description
-        if (!empty($ai_content['description_short'])) {
-            $content .= $ai_content['description_short'] . "\n\n";
+        if (!empty($ai_content['description'])) {
+            $content .= $ai_content['description'] . "\n\n";
         }
 
         // Sponsor
