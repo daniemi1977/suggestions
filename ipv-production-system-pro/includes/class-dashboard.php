@@ -182,7 +182,7 @@ class IPV_Dashboard {
                         <span class="ipv-link-icon">📝</span>
                         <span class="ipv-link-text">Tutti i Post</span>
                     </a>
-                    <a href="https://ilpuntodivista.it" target="_blank" class="ipv-link-card">
+                    <a href="https://ilpuntodivistachannel.com" target="_blank" class="ipv-link-card">
                         <span class="ipv-link-icon">🌐</span>
                         <span class="ipv-link-text">Il Punto di Vista</span>
                     </a>

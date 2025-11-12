@@ -28,7 +28,7 @@ class IPV_OpenAI_API {
      * Get model from settings
      */
     private function get_model() {
-        return get_option('ipv_pro_openai_model', 'gpt-4-turbo-preview');
+        return get_option('ipv_pro_openai_model', 'gpt-4o-mini');
     }
 
     /**

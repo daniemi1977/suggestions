@@ -55,7 +55,7 @@ class IPV_Channel_Config {
 
             // Contact Information
             'contact_email' => get_option('ipv_pro_contact_email', 'ilpuntodivistaredazione@gmail.com'),
-            'contact_website' => get_option('ipv_pro_contact_website', 'https://www.ilpuntodivista.it'),
+            'contact_website' => get_option('ipv_pro_contact_website', 'https://ilpuntodivistachannel.com'),
             'contact_phone' => get_option('ipv_pro_contact_phone', ''),
 
             // Additional Links
