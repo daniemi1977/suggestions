@@ -45,6 +45,7 @@ class IPV_Production_System_Pro {
     public $video_manager;
     public $dashboard;
     public $ajax_handlers;
+    public $theme_integration;
 
     /**
      * Get singleton instance
@@ -80,6 +81,7 @@ class IPV_Production_System_Pro {
         require_once IPV_PRO_INCLUDES_DIR . 'class-video-manager.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-dashboard.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-ajax-handlers.php';
+        require_once IPV_PRO_INCLUDES_DIR . 'class-theme-integration.php';
     }
 
     /**
@@ -106,6 +108,7 @@ class IPV_Production_System_Pro {
         $this->video_manager = new IPV_Video_Manager();
         $this->dashboard = new IPV_Dashboard();
         $this->ajax_handlers = new IPV_Ajax_Handlers();
+        $this->theme_integration = new IPV_Theme_Integration();
     }
 
     /**

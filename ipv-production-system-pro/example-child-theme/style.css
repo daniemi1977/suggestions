@@ -1,0 +1,106 @@
+/*
+Theme Name: Influencer Child - IPV Integration
+Theme URI: https://ilpuntodivistachannel.com
+Description: Child theme per Influencer con integrazione IPV Production System Pro
+Author: Daniele
+Author URI: https://ilpuntodivistachannel.com
+Template: influencer
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: influencer-child-ipv
+*/
+
+/* ========================================
+   IMPORTA STILE TEMA PARENT
+   ======================================== */
+
+/* Lo stile del tema parent viene caricato tramite functions.php */
+
+/* ========================================
+   PERSONALIZZAZIONI IPV
+   ======================================== */
+
+/* Container Video Post */
+.single-post.ipv-video-post .entry-content {
+    max-width: 100%;
+}
+
+.single-post.ipv-video-post .ipv-video-container {
+    margin: 40px auto;
+    max-width: 1200px;
+}
+
+/* Meta Informazioni Video */
+.ipv-video-meta {
+    margin: 30px auto;
+    max-width: 1200px;
+}
+
+/* Ottimizza Grid per Tema Influencer */
+.influencer-theme .ipv-video-grid {
+    gap: 25px;
+}
+
+/* Card Video - Stile Influencer */
+.influencer-theme .ipv-video-card {
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+.influencer-theme .ipv-video-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Typography Override */
+.influencer-theme .ipv-video-title a {
+    font-family: inherit;
+    font-weight: 700;
+}
+
+/* Colori Brand Influencer */
+:root {
+    --ipv-primary-color: #667eea;
+    --ipv-secondary-color: #764ba2;
+    --ipv-accent-color: #f093fb;
+}
+
+.ipv-video-meta {
+    background: linear-gradient(135deg, var(--ipv-primary-color) 0%, var(--ipv-secondary-color) 100%);
+}
+
+/* Widget Sidebar */
+.widget.ipv-widget {
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.widget.ipv-widget .widget-title {
+    margin-top: 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--ipv-primary-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .single-post.ipv-video-post .ipv-video-container {
+        margin: 20px -15px;
+        border-radius: 0;
+    }
+}
+
+/* Dark Mode Support (if Influencer theme has dark mode) */
+body.dark-mode .ipv-video-card {
+    background: #1a1a1a;
+    border-color: #333;
+}
+
+body.dark-mode .ipv-video-title a {
+    color: #fff;
+}
+
+body.dark-mode .widget.ipv-widget {
+    background: #1a1a1a;
+}
