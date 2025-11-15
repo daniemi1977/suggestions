@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: IPV Production System Pro
+ * Plugin Name: IPV Production System Pro - ULTIMATE Edition
  * Plugin URI: https://ilpuntodivistachannel.com
- * Description: Sistema editoriale completo per importazione automatica video YouTube con trascrizione AI (SupaData), generazione contenuti (OpenAI) e aggiornamenti giornalieri. Output formato Notion.
- * Version: 2.2.0
+ * Description: Sistema editoriale enterprise con Dashboard Ultimate, Tools Avanzati, controllo media duplicati/orfani, diagnostics, cache management, export/import config e molto altro.
+ * Version: 2.3.0
  * Author: Daniele
  * Author URI: https://ilpuntodivistachannel.com
  * License: GPL-2.0+
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('IPV_PRO_VERSION', '2.2.0');
+define('IPV_PRO_VERSION', '2.3.0');
 define('IPV_PRO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('IPV_PRO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('IPV_PRO_INCLUDES_DIR', IPV_PRO_PLUGIN_DIR . 'includes/');
@@ -73,21 +73,32 @@ class IPV_Production_System_Pro {
      * Load required files
      */
     private function load_dependencies() {
+        // Core System
         require_once IPV_PRO_INCLUDES_DIR . 'class-logger.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-cpt-video.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-admin-actions.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-channel-config.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-prompt-builder.php';
+
+        // API Integration
         require_once IPV_PRO_INCLUDES_DIR . 'class-youtube-api.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-youtube-data-updater.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-supadata-api.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-openai-api.php';
+
+        // Processing & Management
         require_once IPV_PRO_INCLUDES_DIR . 'class-queue-manager.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-rss-auto-import.php';
-        require_once IPV_PRO_INCLUDES_DIR . 'class-settings.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-video-manager.php';
+
+        // Admin Interface
+        require_once IPV_PRO_INCLUDES_DIR . 'class-settings.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-dashboard.php';
+        require_once IPV_PRO_INCLUDES_DIR . 'class-dashboard-ultimate.php';  // NEW: Ultimate Dashboard
+        require_once IPV_PRO_INCLUDES_DIR . 'class-tools-advanced.php';      // NEW: Advanced Tools
         require_once IPV_PRO_INCLUDES_DIR . 'class-ajax-handlers.php';
+
+        // Frontend
         require_once IPV_PRO_INCLUDES_DIR . 'class-theme-integration.php';
     }
 
@@ -119,6 +130,10 @@ class IPV_Production_System_Pro {
         $this->dashboard = new IPV_Dashboard();
         $this->ajax_handlers = new IPV_Ajax_Handlers();
         $this->theme_integration = new IPV_Theme_Integration();
+
+        // Initialize ULTIMATE Edition components
+        IPV_Dashboard_Ultimate::init();
+        IPV_Tools_Advanced::init();
     }
 
     /**
