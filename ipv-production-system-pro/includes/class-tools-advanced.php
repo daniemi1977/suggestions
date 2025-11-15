@@ -42,6 +42,7 @@ class IPV_Tools_Advanced {
         add_action('wp_ajax_ipv_check_orphan_videos', [__CLASS__, 'ajax_check_orphan_videos']);
         add_action('wp_ajax_ipv_delete_orphan_videos', [__CLASS__, 'ajax_delete_orphan_videos']);
         add_action('wp_ajax_ipv_repair_orphan_videos', [__CLASS__, 'ajax_repair_orphan_videos']);
+        add_action('wp_ajax_ipv_deep_clean_database', [__CLASS__, 'ajax_deep_clean_database']);
     }
 
     public static function add_menu() {
@@ -350,6 +351,83 @@ class IPV_Tools_Advanced {
                                 <span class="dashicons dashicons-admin-page"></span> Copia Shortcode
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Deep Clean Database (DANGER ZONE!) -->
+                <div class="ipv-tool-card ipv-tool-wide" style="border: 3px solid #d63638;">
+                    <div class="ipv-tool-header" style="background: #d63638; color: white;">
+                        <span class="dashicons dashicons-warning"></span>
+                        <h2>⚠️ PULIZIA PROFONDA DATABASE - ZONA PERICOLOSA</h2>
+                    </div>
+                    <div class="ipv-tool-body">
+                        <div class="notice notice-error inline" style="margin: 0 0 15px 0; padding: 15px; border-left-width: 5px;">
+                            <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px 0;">
+                                ⛔ ATTENZIONE: QUESTA OPERAZIONE ELIMINA DEFINITIVAMENTE TUTTI I DATI DEI VIDEO!
+                            </p>
+                            <p style="margin: 0;">
+                                Verranno eliminate TUTTE le seguenti informazioni:<br>
+                                • Tutti i post ipv_video (pubblicati, bozze, trash)<br>
+                                • Tutti i metadati video (_ipv_*)<br>
+                                • Tutti i record nella coda processing<br>
+                                • Tutte le relazioni con categorie e tassonomie<br>
+                                • TUTTO sarà IRRECUPERABILE!
+                            </p>
+                        </div>
+
+                        <p style="font-weight: bold; color: #d63638;">
+                            Usa questo tool SOLO se vuoi ricominciare da zero con un database completamente pulito!
+                        </p>
+
+                        <?php
+                        global $wpdb;
+                        $queue_table = $wpdb->prefix . 'ipv_processing_queue';
+
+                        $total_posts = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'ipv_video'");
+                        $total_meta = $wpdb->get_var("
+                            SELECT COUNT(*) FROM {$wpdb->postmeta} pm
+                            INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+                            WHERE p.post_type = 'ipv_video'
+                        ");
+                        $total_queue = $wpdb->get_var("SELECT COUNT(*) FROM {$queue_table}");
+                        $total_relations = $wpdb->get_var("
+                            SELECT COUNT(*) FROM {$wpdb->term_relationships} tr
+                            INNER JOIN {$wpdb->posts} p ON tr.object_id = p.ID
+                            WHERE p.post_type = 'ipv_video'
+                        ");
+                        ?>
+
+                        <div class="ipv-db-info" style="background: #fff3cd; padding: 15px; border-left: 4px solid #856404; margin: 15px 0;">
+                            <h3 style="margin: 0 0 10px 0; color: #856404;">📊 DATI CHE VERRANNO ELIMINATI:</h3>
+                            <div><strong>Video Posts (ipv_video):</strong> <?php echo number_format($total_posts); ?></div>
+                            <div><strong>Post Meta Records:</strong> <?php echo number_format($total_meta); ?></div>
+                            <div><strong>Queue Records:</strong> <?php echo number_format($total_queue); ?></div>
+                            <div><strong>Taxonomy Relations:</strong> <?php echo number_format($total_relations); ?></div>
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #856404;">
+                                <strong>TOTALE RECORD DA ELIMINARE:</strong> <span style="color: #d63638; font-size: 18px; font-weight: bold;">
+                                    <?php echo number_format($total_posts + $total_meta + $total_queue + $total_relations); ?>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div style="background: #f0f0f1; padding: 15px; margin: 15px 0; border-radius: 4px;">
+                            <h4 style="margin: 0 0 10px 0;">✅ Questa operazione è utile se:</h4>
+                            <ul style="margin: 0;">
+                                <li>Vuoi ricominciare da zero con nuovi video</li>
+                                <li>Hai dati corrotti o inconsistenti nel database</li>
+                                <li>Vuoi fare test di import massivi</li>
+                                <li>Hai problemi con video duplicati o invisibili che non riesci a risolvere</li>
+                            </ul>
+                        </div>
+
+                        <div class="ipv-tool-actions" style="margin-top: 20px;">
+                            <button class="button button-large button-link-delete" id="ipv-deep-clean-database" style="height: 50px; font-size: 16px; font-weight: bold;">
+                                <span class="dashicons dashicons-trash" style="font-size: 20px;"></span>
+                                ELIMINA TUTTO IL DATABASE VIDEO
+                            </button>
+                        </div>
+
+                        <div id="deep-clean-status" class="ipv-tool-status"></div>
                     </div>
                 </div>
 
@@ -847,6 +925,125 @@ class IPV_Tools_Advanced {
             'message' => "✅ Video riparati e riassociati alla queue! ({$repaired} video ora visibili nel Video Manager)",
             'repaired' => $repaired
         ]);
+    }
+
+    /**
+     * Deep Clean Database - ELIMINATES ALL VIDEO DATA FROM ALL TABLES
+     * WARNING: This is IRREVERSIBLE and DESTRUCTIVE!
+     */
+    public static function ajax_deep_clean_database() {
+        global $wpdb;
+
+        // Security check
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Non autorizzato!']);
+            return;
+        }
+
+        $queue_table = $wpdb->prefix . 'ipv_processing_queue';
+
+        // Count data before deletion (for reporting)
+        $count_posts = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'ipv_video'");
+        $count_meta = $wpdb->get_var("
+            SELECT COUNT(*) FROM {$wpdb->postmeta} pm
+            INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+            WHERE p.post_type = 'ipv_video'
+        ");
+        $count_queue = $wpdb->get_var("SELECT COUNT(*) FROM {$queue_table}");
+        $count_relations = $wpdb->get_var("
+            SELECT COUNT(*) FROM {$wpdb->term_relationships} tr
+            INNER JOIN {$wpdb->posts} p ON tr.object_id = p.ID
+            WHERE p.post_type = 'ipv_video'
+        ");
+
+        // Start transaction for safety
+        $wpdb->query('START TRANSACTION');
+
+        try {
+            // STEP 1: Delete all ipv_video posts (this will also trigger wp_delete_post hooks)
+            $post_ids = $wpdb->get_col("SELECT ID FROM {$wpdb->posts} WHERE post_type = 'ipv_video'");
+
+            $deleted_posts = 0;
+            foreach ($post_ids as $post_id) {
+                // wp_delete_post with true = force delete, bypass trash
+                if (wp_delete_post($post_id, true)) {
+                    $deleted_posts++;
+                }
+            }
+
+            // STEP 2: Delete any remaining postmeta (cleanup stragglers)
+            $wpdb->query("
+                DELETE pm FROM {$wpdb->postmeta} pm
+                LEFT JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+                WHERE p.ID IS NULL
+            ");
+
+            // STEP 3: Delete all queue records
+            $deleted_queue = $wpdb->query("TRUNCATE TABLE {$queue_table}");
+
+            // STEP 4: Delete orphan term relationships (cleanup any left from posts)
+            $wpdb->query("
+                DELETE tr FROM {$wpdb->term_relationships} tr
+                LEFT JOIN {$wpdb->posts} p ON tr.object_id = p.ID
+                WHERE p.ID IS NULL
+            ");
+
+            // STEP 5: Clean up orphan terms in custom taxonomies (optional but recommended)
+            $taxonomies = ['ipv_topic', 'ipv_guest', 'ipv_channel_theme'];
+            foreach ($taxonomies as $taxonomy) {
+                // Delete terms that have no posts associated
+                $wpdb->query("
+                    DELETE t FROM {$wpdb->terms} t
+                    INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+                    LEFT JOIN {$wpdb->term_relationships} tr ON tt.term_taxonomy_id = tr.term_taxonomy_id
+                    WHERE tt.taxonomy = '{$taxonomy}'
+                    AND tr.object_id IS NULL
+                ");
+            }
+
+            // STEP 6: Optimize tables after mass deletion
+            $wpdb->query("OPTIMIZE TABLE {$wpdb->posts}");
+            $wpdb->query("OPTIMIZE TABLE {$wpdb->postmeta}");
+            $wpdb->query("OPTIMIZE TABLE {$queue_table}");
+            $wpdb->query("OPTIMIZE TABLE {$wpdb->term_relationships}");
+
+            // Commit transaction
+            $wpdb->query('COMMIT');
+
+            // Success message with detailed report
+            wp_send_json_success([
+                'message' => sprintf(
+                    "✅ DATABASE COMPLETAMENTE PULITO!\n\n" .
+                    "📊 Record eliminati:\n" .
+                    "• Video Posts: %d\n" .
+                    "• Post Meta: %d\n" .
+                    "• Queue Records: %d\n" .
+                    "• Taxonomy Relations: %d\n\n" .
+                    "TOTALE: %d record eliminati\n\n" .
+                    "Il database è ora completamente pulito e pronto per nuovi import!",
+                    $deleted_posts,
+                    $count_meta,
+                    $count_queue,
+                    $count_relations,
+                    $deleted_posts + $count_meta + $count_queue + $count_relations
+                ),
+                'deleted' => [
+                    'posts' => $deleted_posts,
+                    'meta' => $count_meta,
+                    'queue' => $count_queue,
+                    'relations' => $count_relations,
+                    'total' => $deleted_posts + $count_meta + $count_queue + $count_relations
+                ]
+            ]);
+
+        } catch (Exception $e) {
+            // Rollback on error
+            $wpdb->query('ROLLBACK');
+
+            wp_send_json_error([
+                'message' => '❌ Errore durante la pulizia del database: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -1539,6 +1736,43 @@ CSS;
                     showStatus('#orphan-videos-status', res.data.message, res.success ? 'success' : 'error');
                     if (res.success) {
                         setTimeout(function() { location.reload(); }, 2000);
+                    }
+                });
+            });
+
+            // Deep Clean Database (DANGER ZONE!)
+            $('#ipv-deep-clean-database').on('click', function() {
+                // Triple confirmation with clear warnings
+                if (!confirm('🚨 ZONA PERICOLOSA! 🚨\n\nStai per ELIMINARE DEFINITIVAMENTE:\n• Tutti i post ipv_video\n• Tutti i metadati\n• Tutta la coda processing\n• Tutte le relazioni taxonomie\n\nQuesta azione è IRREVERSIBILE!\n\nSei ASSOLUTAMENTE SICURO?\n\n(Clicca Annulla per fermarti ora!)')) {
+                    return;
+                }
+
+                // Second confirmation
+                if (!confirm('⚠️ SECONDA CONFERMA ⚠️\n\nHai capito che:\n\n1. TUTTO verrà eliminato dal database\n2. NON potrai recuperare i dati\n3. Dovrai reimportare tutti i video da zero\n\nVuoi davvero continuare?')) {
+                    return;
+                }
+
+                // Third confirmation - type confirmation
+                var typedConfirm = prompt('🛑 ULTIMA CONFERMA 🛑\n\nPer procedere con la PULIZIA TOTALE DEL DATABASE,\nscrivi esattamente questa parola:\n\nELIMINA\n\n(Maiuscolo, senza errori)');
+
+                if (typedConfirm !== 'ELIMINA') {
+                    alert('❌ Operazione annullata!\n\nLa parola digitata non corrisponde.\nIl database NON è stato modificato.');
+                    return;
+                }
+
+                // All confirmations passed - proceed with deep clean
+                showStatus('#deep-clean-status', '⚠️ PULIZIA PROFONDA IN CORSO... Attendere, non chiudere la pagina!', 'info');
+                $(this).prop('disabled', true).text('🔄 Eliminazione in corso...');
+
+                $.post(ajaxurl, {action: 'ipv_deep_clean_database'}, function(res) {
+                    if (res.success) {
+                        showStatus('#deep-clean-status', res.data.message, 'success');
+                        alert('✅ DATABASE COMPLETAMENTE PULITO!\n\n' + res.data.message + '\n\nLa pagina si ricaricherà tra 3 secondi...');
+                        setTimeout(function() { location.reload(); }, 3000);
+                    } else {
+                        showStatus('#deep-clean-status', res.data.message, 'error');
+                        $('#ipv-deep-clean-database').prop('disabled', false).html('<span class="dashicons dashicons-trash"></span> ELIMINA TUTTO IL DATABASE VIDEO');
+                        alert('❌ ERRORE!\n\n' + res.data.message);
                     }
                 });
             });

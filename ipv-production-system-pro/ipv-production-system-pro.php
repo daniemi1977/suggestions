@@ -11,7 +11,7 @@
  * Requires at least: 5.8
  * Requires PHP: 7.4
  *
- * CHANGELOG v2.3.2 - Orphan Videos Detector & Repair Tool
+ * CHANGELOG v2.3.2 - Orphan Videos Detector & Deep Clean Database Tool
  * ✅ Rilevamento automatico video orfani (post senza queue entry)
  * ✅ Lista dettagliata video orfani con ID, titolo, stato, data
  * ✅ Funzione "Ripara" - riassocia video orfani alla queue (li rende visibili)
@@ -22,6 +22,16 @@
  * ✅ Conferme di sicurezza per operazioni distruttive
  * ✅ Auto-refresh dopo riparazione/eliminazione
  * ✅ Risolve problema: "video importati precedentemente non visibili dopo aggiornamento plugin"
+ * ✅ **DEEP CLEAN DATABASE** - Pulizia profonda di TUTTE le tabelle:
+ *    • Elimina tutti i post ipv_video (pubblicati, bozze, trash)
+ *    • Elimina tutti i postmeta (_ipv_*)
+ *    • Pulisce completamente la coda processing (ipv_processing_queue)
+ *    • Rimuove tutte le relazioni con categorie e tassonomie
+ *    • Pulisce termini orfani nelle tassonomie custom
+ *    • Ottimizza tutte le tabelle dopo la pulizia
+ *    • Triple conferma di sicurezza (con digitazione parola "ELIMINA")
+ *    • Transaction SQL per rollback in caso di errori
+ *    • Report dettagliato con conteggio record eliminati
  *
  * CHANGELOG v2.3.1 - RSS Auto-Taxonomy System
  * ✅ Auto-import categorie canale YouTube → WordPress categories
