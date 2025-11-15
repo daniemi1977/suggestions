@@ -211,6 +211,9 @@ class IPV_Production_System_Pro {
      * Initialize plugin components
      */
     private function init_components() {
+        // Check and run database migrations if needed
+        $this->check_database_migration();
+
         $this->cpt_video = new IPV_CPT_Video();
         $this->admin_actions = new IPV_Admin_Actions();
         $this->youtube_api = new IPV_YouTube_API();
@@ -256,6 +259,13 @@ class IPV_Production_System_Pro {
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+
+        // MIGRATION: Add current_step column if it doesn't exist (for existing installations)
+        $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table_name} LIKE 'current_step'");
+        if (empty($column_exists)) {
+            $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN current_step varchar(100) DEFAULT NULL AFTER status");
+            error_log('[IPV Migration] Added current_step column to ' . $table_name);
+        }
 
         // Set default options
         $defaults = [
@@ -316,6 +326,33 @@ class IPV_Production_System_Pro {
 
         // Unschedule YouTube data updates
         IPV_YouTube_Data_Updater::unschedule_cron();
+    }
+
+    /**
+     * Check and run database migrations
+     * This ensures existing installations get schema updates
+     */
+    private function check_database_migration() {
+        global $wpdb;
+
+        $db_version = get_option('ipv_pro_db_version', '1.0.0');
+        $current_version = IPV_PRO_VERSION;
+
+        // Migration for v2.4.0: Add current_step column
+        if (version_compare($db_version, '2.4.0', '<')) {
+            $table_name = $wpdb->prefix . 'ipv_processing_queue';
+
+            // Check if current_step column exists
+            $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table_name} LIKE 'current_step'");
+
+            if (empty($column_exists)) {
+                $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN current_step varchar(100) DEFAULT NULL AFTER status");
+                error_log('[IPV Migration v2.4.0] Added current_step column to ' . $table_name);
+            }
+
+            // Update db version
+            update_option('ipv_pro_db_version', '2.4.0');
+        }
     }
 
     /**
