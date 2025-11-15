@@ -79,11 +79,11 @@ class IPV_Queue_Manager {
             return new WP_Error('already_imported', 'Video già importato (Post ID: ' . $existing_post . ')');
         }
 
-        // Create draft post
+        // Create draft post with CPT ipv_video
         $post_id = wp_insert_post([
             'post_title' => 'Video YouTube (processing...)',
             'post_status' => 'draft',
-            'post_type' => 'post'
+            'post_type' => 'ipv_video'
         ]);
 
         if (is_wp_error($post_id)) {
@@ -372,14 +372,68 @@ class IPV_Queue_Manager {
 
         wp_update_post($post_data);
 
-        // Add hashtags as tags
+        // Apply taxonomies from AI content
+        $this->apply_taxonomies_from_ai($post_id, $ai_content);
+    }
+
+    /**
+     * Apply taxonomies from AI content
+     */
+    private function apply_taxonomies_from_ai($post_id, $ai_content) {
+        // Extract and assign topics
+        if (!empty($ai_content['topics'])) {
+            $topics = $this->extract_terms_from_text($ai_content['topics']);
+            if (!empty($topics)) {
+                wp_set_object_terms($post_id, $topics, 'ipv_topic');
+            }
+        }
+
+        // Extract and assign guests
+        if (!empty($ai_content['guests'])) {
+            $guests = $this->extract_terms_from_text($ai_content['guests']);
+            if (!empty($guests)) {
+                wp_set_object_terms($post_id, $guests, 'ipv_guest');
+            }
+        }
+
+        // Extract and assign channel themes
+        if (!empty($ai_content['temi_canale'])) {
+            $themes = $this->extract_terms_from_text($ai_content['temi_canale']);
+            if (!empty($themes)) {
+                wp_set_object_terms($post_id, $themes, 'ipv_channel_theme');
+            }
+        }
+
+        // Extract and assign hashtags as post tags
         if (!empty($ai_content['hashtags'])) {
             $hashtags = explode(' ', $ai_content['hashtags']);
             $tags = array_map(function($tag) {
                 return ltrim($tag, '#');
             }, $hashtags);
-            wp_set_post_tags($post_id, $tags);
+            $tags = array_filter($tags);
+            if (!empty($tags)) {
+                wp_set_post_tags($post_id, $tags);
+            }
         }
+    }
+
+    /**
+     * Extract terms from text (comma or newline separated)
+     */
+    private function extract_terms_from_text($text) {
+        // Remove markdown list markers
+        $text = preg_replace('/^[\-\*\+]\s+/m', '', $text);
+        $text = preg_replace('/^\d+\.\s+/m', '', $text);
+
+        // Split by comma or newline
+        $items = preg_split('/[,\n]+/', $text);
+
+        // Clean and filter
+        $items = array_map('trim', $items);
+        $items = array_filter($items);
+        $items = array_unique($items);
+
+        return array_values($items);
     }
 
     /**

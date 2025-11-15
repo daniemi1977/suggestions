@@ -3,7 +3,7 @@
  * Plugin Name: IPV Production System Pro
  * Plugin URI: https://ilpuntodivistachannel.com
  * Description: Sistema completo per importazione automatica video YouTube con trascrizione AI (SupaData) e generazione contenuti (OpenAI) per Il Punto di Vista
- * Version: 2.0.0
+ * Version: 2.1.0
  * Author: Daniele
  * Author URI: https://ilpuntodivistachannel.com
  * License: GPL-2.0+
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('IPV_PRO_VERSION', '2.0.0');
+define('IPV_PRO_VERSION', '2.1.0');
 define('IPV_PRO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('IPV_PRO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('IPV_PRO_INCLUDES_DIR', IPV_PRO_PLUGIN_DIR . 'includes/');
@@ -36,6 +36,8 @@ class IPV_Production_System_Pro {
     /**
      * Class instances
      */
+    public $cpt_video;
+    public $admin_actions;
     public $youtube_api;
     public $supadata_api;
     public $openai_api;
@@ -70,6 +72,8 @@ class IPV_Production_System_Pro {
      * Load required files
      */
     private function load_dependencies() {
+        require_once IPV_PRO_INCLUDES_DIR . 'class-cpt-video.php';
+        require_once IPV_PRO_INCLUDES_DIR . 'class-admin-actions.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-channel-config.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-prompt-builder.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-youtube-api.php';
@@ -99,6 +103,8 @@ class IPV_Production_System_Pro {
      * Initialize plugin components
      */
     private function init_components() {
+        $this->cpt_video = new IPV_CPT_Video();
+        $this->admin_actions = new IPV_Admin_Actions();
         $this->youtube_api = new IPV_YouTube_API();
         $this->supadata_api = new IPV_SupaData_API();
         $this->openai_api = new IPV_OpenAI_API();
@@ -213,6 +219,51 @@ class IPV_Production_System_Pro {
             'manage_options',
             'ipv-production-pro',
             [$this->dashboard, 'render_page']
+        );
+
+        // All Videos (CPT) submenu
+        add_submenu_page(
+            'ipv-production-pro',
+            'Tutti i Video',
+            'Tutti i Video',
+            'manage_options',
+            'edit.php?post_type=ipv_video'
+        );
+
+        // Add New Video submenu
+        add_submenu_page(
+            'ipv-production-pro',
+            'Aggiungi Video',
+            'Aggiungi Video',
+            'manage_options',
+            'post-new.php?post_type=ipv_video'
+        );
+
+        // Topics taxonomy
+        add_submenu_page(
+            'ipv-production-pro',
+            'Argomenti',
+            'Argomenti',
+            'manage_options',
+            'edit-tags.php?taxonomy=ipv_topic&post_type=ipv_video'
+        );
+
+        // Guests taxonomy
+        add_submenu_page(
+            'ipv-production-pro',
+            'Ospiti',
+            'Ospiti',
+            'manage_options',
+            'edit-tags.php?taxonomy=ipv_guest&post_type=ipv_video'
+        );
+
+        // Channel Themes taxonomy
+        add_submenu_page(
+            'ipv-production-pro',
+            'Temi Canale',
+            'Temi Canale',
+            'manage_options',
+            'edit-tags.php?taxonomy=ipv_channel_theme&post_type=ipv_video'
         );
 
         // Video Manager submenu
