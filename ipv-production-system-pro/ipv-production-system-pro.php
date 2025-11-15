@@ -2,8 +2,8 @@
 /**
  * Plugin Name: IPV Production System Pro
  * Plugin URI: https://ilpuntodivistachannel.com
- * Description: Sistema completo per importazione automatica video YouTube con trascrizione AI (SupaData) e generazione contenuti (OpenAI) per Il Punto di Vista
- * Version: 2.1.0
+ * Description: Sistema editoriale completo per importazione automatica video YouTube con trascrizione AI (SupaData), generazione contenuti (OpenAI) e aggiornamenti giornalieri. Output formato Notion.
+ * Version: 2.2.0
  * Author: Daniele
  * Author URI: https://ilpuntodivistachannel.com
  * License: GPL-2.0+
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('IPV_PRO_VERSION', '2.1.0');
+define('IPV_PRO_VERSION', '2.2.0');
 define('IPV_PRO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('IPV_PRO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('IPV_PRO_INCLUDES_DIR', IPV_PRO_PLUGIN_DIR . 'includes/');
