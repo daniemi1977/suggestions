@@ -47,8 +47,8 @@ class CWAU_Chat {
             return;
         }
 
-        wp_enqueue_style('cwau-chat', CWAU_URL . 'assets/chat-frontend.css', array(), CWAU_VERSION);
-        wp_enqueue_script('cwau-chat', CWAU_URL . 'assets/chat-frontend.js', array('jquery'), CWAU_VERSION, true);
+        wp_enqueue_style('cwau-chat', CWAU_URL . 'assets/chat-frontend-enhanced.css', array(), CWAU_VERSION);
+        wp_enqueue_script('cwau-chat', CWAU_URL . 'assets/chat-frontend-enhanced.js', array('jquery'), CWAU_VERSION, true);
 
         // Get or create session ID
         if (!session_id()) {
@@ -178,7 +178,14 @@ class CWAU_Chat {
             $history = CWAU_Database::get_conversation_messages($conversation_id, 10);
 
             // Generate AI response with RAG
-            $response = self::generate_ai_response($message, $history);
+            $ai_data = self::generate_ai_response($message, $history);
+            $response = $ai_data['text'];
+            $rag_products = $ai_data['rag_products'] ?? array();
+
+            // Parse response and enrich with product cards
+            $enriched = CWAU_Rich_Messages::parse_and_enrich_response($response, $rag_products);
+            $response = $enriched['text'];
+            $rich_content = $enriched['rich_content'];
 
             // Analyze sentiment
             $sentiment = self::analyze_sentiment($message);
@@ -192,10 +199,24 @@ class CWAU_Chat {
             CWAU_Database::add_message($conversation_id, 'ai', $response);
         }
 
-        wp_send_json_success(array(
+        // Prepare response with rich content
+        $response_data = array(
             'message' => $response,
             'conversation_id' => $conversation_id
-        ));
+        );
+
+        // Add rich content if available
+        if (!empty($rich_content)) {
+            $response_data['rich_content'] = array();
+            foreach ($rich_content as $content) {
+                $response_data['rich_content'][] = array(
+                    'type' => $content['type'],
+                    'html' => CWAU_Rich_Messages::render_rich_content(array($content))
+                );
+            }
+        }
+
+        wp_send_json_success($response_data);
     }
 
     /**
@@ -204,8 +225,18 @@ class CWAU_Chat {
     private static function generate_ai_response($user_message, $history = array()) {
         $preferred_ai = get_option('cwau_preferred_ai', 'openai');
 
-        // Get RAG context
-        $rag_context = CWAU_RAG::get_context_for_query($user_message);
+        // Get RAG products and context
+        $rag_products = array();
+        $rag_context = '';
+
+        if (get_option('cwau_rag_enabled', 1)) {
+            $top_k = get_option('cwau_rag_top_k', 5);
+            $rag_products = CWAU_RAG::search_similar_products($user_message, $top_k);
+
+            if (!empty($rag_products)) {
+                $rag_context = CWAU_RAG::get_context_for_query($user_message, $top_k);
+            }
+        }
 
         // Build conversation history
         $messages = array();
@@ -233,10 +264,16 @@ class CWAU_Chat {
 
         // Call appropriate AI
         if ($preferred_ai === 'anthropic') {
-            return self::call_anthropic_api($system_prompt, $messages);
+            $ai_response = self::call_anthropic_api($system_prompt, $messages);
         } else {
-            return self::call_openai_api($system_prompt, $messages);
+            $ai_response = self::call_openai_api($system_prompt, $messages);
         }
+
+        // Return response with RAG products
+        return array(
+            'text' => $ai_response,
+            'rag_products' => $rag_products
+        );
     }
 
     /**
