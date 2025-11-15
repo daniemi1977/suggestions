@@ -3,13 +3,38 @@
  * Plugin Name: IPV Production System Pro - ULTIMATE Edition
  * Plugin URI: https://ilpuntodivistachannel.com
  * Description: Sistema editoriale enterprise con Dashboard Ultimate, Tools Avanzati, RSS Auto-Taxonomy (categorie, relatori, tag automatici), controllo media duplicati/orfani, diagnostics, cache management, export/import config, orphan videos detector e molto altro.
- * Version: 2.3.2
+ * Version: 2.3.3
  * Author: Daniele
  * Author URI: https://ilpuntodivistachannel.com
  * License: GPL-2.0+
  * Text Domain: ipv-production-pro
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ *
+ * CHANGELOG v2.3.3 - Auto-Repair Orphan Videos System
+ * ✅ Sistema automatico di riparazione video orfani
+ * ✅ Opzione nelle impostazioni "Auto-Ripara Video Orfani" (abilitata di default)
+ * ✅ Si esegue automaticamente DOPO ogni RSS auto-import
+ * ✅ Trova video esistenti nel database ma non nella queue
+ * ✅ Li riassocia automaticamente (status: 'auto_repaired')
+ * ✅ Logging dettagliato di tutte le operazioni
+ * ✅ Report nel messaggio auto-import: "Auto-repair: X video orfani riparati"
+ * ✅ Può essere disabilitato se non serve
+ * ✅ Limite 100 video per esecuzione (performance)
+ * ✅ Skip video senza URL (con logging errore)
+ * ✅ RISOLVE PER SEMPRE il problema dei video invisibili!
+ *
+ * Come funziona:
+ * 1. Ogni volta che RSS auto-import viene eseguito
+ * 2. Dopo import, cerca video orfani (LEFT JOIN)
+ * 3. Per ogni video orfano trovato:
+ *    - Recupera video_url da meta (o ricostruisce da video_id)
+ *    - Lo riaggiunge alla queue come 'completed'
+ *    - Logga l'operazione
+ * 4. I video diventano immediatamente visibili
+ * 5. Report finale con count video riparati
+ *
+ * Configurazione: Impostazioni → RSS Auto-Import → "Auto-Ripara Video Orfani"
  *
  * CHANGELOG v2.3.2 - Orphan Videos Detector & Deep Clean Database Tool
  * ✅ Rilevamento automatico video orfani (post senza queue entry)

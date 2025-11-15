@@ -687,6 +687,121 @@ class IPV_Queue_Manager {
     }
 
     /**
+     * Auto-Repair Orphan Videos
+     *
+     * Automatically finds and repairs videos that exist as posts but are not in the queue.
+     * This solves the problem of "invisible videos" after plugin updates or incomplete imports.
+     *
+     * @return array Results with count of repaired videos
+     */
+    public function auto_repair_orphan_videos() {
+        global $wpdb;
+
+        // Check if auto-repair is enabled
+        if (!get_option('ipv_pro_auto_repair_orphans', 1)) {
+            return [
+                'enabled' => false,
+                'repaired' => 0,
+                'message' => 'Auto-repair disabilitato nelle impostazioni'
+            ];
+        }
+
+        error_log('[IPV Auto-Repair] Starting automatic orphan video repair...');
+
+        // Find orphan posts (posts without queue entry)
+        $orphan_posts = $wpdb->get_results("
+            SELECT p.ID, p.post_title
+            FROM {$wpdb->posts} p
+            LEFT JOIN {$this->table_name} q ON p.ID = q.post_id
+            WHERE p.post_type = 'ipv_video'
+            AND q.id IS NULL
+            LIMIT 100
+        ");
+
+        if (empty($orphan_posts)) {
+            error_log('[IPV Auto-Repair] No orphan videos found. Database is clean!');
+            return [
+                'enabled' => true,
+                'repaired' => 0,
+                'message' => 'Nessun video orfano trovato'
+            ];
+        }
+
+        $repaired = 0;
+        $errors = 0;
+
+        foreach ($orphan_posts as $post) {
+            // Get video URL from post meta
+            $video_url = get_post_meta($post->ID, '_ipv_video_url', true);
+
+            if (empty($video_url)) {
+                // Try to get video_id and reconstruct URL
+                $video_id = get_post_meta($post->ID, '_ipv_video_id', true);
+                if (!empty($video_id)) {
+                    $video_url = "https://www.youtube.com/watch?v={$video_id}";
+                }
+            }
+
+            if (empty($video_url)) {
+                error_log(sprintf(
+                    '[IPV Auto-Repair] SKIP - Cannot repair post %d ("%s"): no video URL found',
+                    $post->ID,
+                    $post->post_title
+                ));
+                $errors++;
+                continue;
+            }
+
+            // Re-add to queue as completed (to make it visible)
+            $result = $wpdb->insert(
+                $this->table_name,
+                [
+                    'post_id' => $post->ID,
+                    'video_url' => $video_url,
+                    'status' => 'completed',
+                    'current_step' => 'auto_repaired',
+                    'retry_count' => 0,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ],
+                ['%d', '%s', '%s', '%s', '%d', '%s', '%s']
+            );
+
+            if ($result !== false) {
+                $repaired++;
+                error_log(sprintf(
+                    '[IPV Auto-Repair] ✅ REPAIRED - Post %d ("%s") now visible in Video Manager',
+                    $post->ID,
+                    $post->post_title
+                ));
+            } else {
+                $errors++;
+                error_log(sprintf(
+                    '[IPV Auto-Repair] ❌ ERROR - Failed to repair post %d ("%s"): %s',
+                    $post->ID,
+                    $post->post_title,
+                    $wpdb->last_error
+                ));
+            }
+        }
+
+        $message = sprintf(
+            'Auto-repair completato: %d video riparati, %d errori',
+            $repaired,
+            $errors
+        );
+
+        error_log("[IPV Auto-Repair] {$message}");
+
+        return [
+            'enabled' => true,
+            'repaired' => $repaired,
+            'errors' => $errors,
+            'message' => $message
+        ];
+    }
+
+    /**
      * Get queue statistics
      */
     public function get_stats() {

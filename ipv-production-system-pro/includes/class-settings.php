@@ -48,6 +48,7 @@ class IPV_Settings {
         register_setting('ipv_pro_settings', 'ipv_pro_auto_import_max_videos');
         register_setting('ipv_pro_settings', 'ipv_pro_auto_import_email_notifications');
         register_setting('ipv_pro_settings', 'ipv_pro_auto_import_notification_email');
+        register_setting('ipv_pro_settings', 'ipv_pro_auto_repair_orphans');
     }
 
     /**
@@ -463,6 +464,33 @@ class IPV_Settings {
                                        class="regular-text">
                                 <p class="description">
                                     Indirizzo email per le notifiche di auto-import
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="auto_repair_orphans">Auto-Ripara Video Orfani</label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox"
+                                           id="auto_repair_orphans"
+                                           name="ipv_pro_auto_repair_orphans"
+                                           value="1"
+                                           <?php checked(get_option('ipv_pro_auto_repair_orphans', 1), 1); ?>>
+                                    Ripara automaticamente i video orfani dopo ogni import
+                                </label>
+                                <p class="description">
+                                    <strong style="color: #2271b1;">✅ CONSIGLIATO!</strong> Se abilitato, dopo ogni auto-import il sistema cercherà e riparerà automaticamente i video che esistono nel database ma non sono visibili nel Video Manager. Risolve problemi causati da aggiornamenti plugin o import incompleti.
+                                </p>
+                                <p class="description" style="margin-top: 8px; padding: 10px; background: #f0f6fc; border-left: 4px solid #2271b1;">
+                                    <strong>Come funziona:</strong><br>
+                                    1. Dopo ogni RSS auto-import<br>
+                                    2. Il sistema cerca video nel database senza queue entry<br>
+                                    3. Li riassocia automaticamente alla queue<br>
+                                    4. I video diventano immediatamente visibili<br>
+                                    5. Tutto viene loggato per tracciabilità
                                 </p>
                             </td>
                         </tr>

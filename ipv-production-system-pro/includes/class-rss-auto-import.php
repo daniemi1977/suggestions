@@ -397,6 +397,22 @@ class IPV_RSS_Auto_Import {
             $this->send_notification($result);
         }
 
+        // Auto-Repair Orphan Videos (if enabled)
+        $auto_repair_result = $queue_manager->auto_repair_orphan_videos();
+        if ($auto_repair_result['enabled'] && $auto_repair_result['repaired'] > 0) {
+            // Add auto-repair info to result message
+            $result['auto_repair'] = $auto_repair_result;
+            $result['message'] .= sprintf(
+                ' | Auto-repair: %d video orfani riparati',
+                $auto_repair_result['repaired']
+            );
+
+            error_log(sprintf(
+                '[IPV Auto-Import] Auto-repair executed: %d orphan videos repaired',
+                $auto_repair_result['repaired']
+            ));
+        }
+
         // Update last check timestamp
         update_option('ipv_pro_auto_import_last_check', current_time('mysql'));
 
