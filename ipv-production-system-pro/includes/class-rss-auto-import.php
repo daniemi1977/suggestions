@@ -346,12 +346,27 @@ class IPV_RSS_Auto_Import {
             $result = $queue_manager->add_to_queue($video_data['video_url'], $video_data);
 
             if (is_wp_error($result)) {
-                $errors++;
-                error_log(sprintf(
-                    '[IPV Auto-Import] Error importing %s: %s',
-                    $video_data['video_url'],
-                    $result->get_error_message()
-                ));
+                // Distinguish between "already exists" (skip) and real errors
+                $error_code = $result->get_error_code();
+
+                if ($error_code === 'already_queued' || $error_code === 'already_imported') {
+                    // These are not real errors, just duplicates
+                    $skipped++;
+                    error_log(sprintf(
+                        '[IPV Auto-Import] Skipped %s: %s',
+                        $video_data['title'],
+                        $result->get_error_message()
+                    ));
+                } else {
+                    // Real errors (invalid_url, db_error, etc.)
+                    $errors++;
+                    error_log(sprintf(
+                        '[IPV Auto-Import] ERROR importing %s: [%s] %s',
+                        $video_data['video_url'],
+                        $error_code,
+                        $result->get_error_message()
+                    ));
+                }
             } else {
                 $imported++;
                 error_log(sprintf(
