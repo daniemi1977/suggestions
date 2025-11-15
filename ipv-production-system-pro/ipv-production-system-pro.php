@@ -39,6 +39,7 @@ class IPV_Production_System_Pro {
     public $cpt_video;
     public $admin_actions;
     public $youtube_api;
+    public $youtube_data_updater;
     public $supadata_api;
     public $openai_api;
     public $queue_manager;
@@ -72,11 +73,13 @@ class IPV_Production_System_Pro {
      * Load required files
      */
     private function load_dependencies() {
+        require_once IPV_PRO_INCLUDES_DIR . 'class-logger.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-cpt-video.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-admin-actions.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-channel-config.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-prompt-builder.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-youtube-api.php';
+        require_once IPV_PRO_INCLUDES_DIR . 'class-youtube-data-updater.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-supadata-api.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-openai-api.php';
         require_once IPV_PRO_INCLUDES_DIR . 'class-queue-manager.php';
@@ -106,6 +109,7 @@ class IPV_Production_System_Pro {
         $this->cpt_video = new IPV_CPT_Video();
         $this->admin_actions = new IPV_Admin_Actions();
         $this->youtube_api = new IPV_YouTube_API();
+        $this->youtube_data_updater = new IPV_YouTube_Data_Updater();
         $this->supadata_api = new IPV_SupaData_API();
         $this->openai_api = new IPV_OpenAI_API();
         $this->queue_manager = new IPV_Queue_Manager();
@@ -186,6 +190,12 @@ class IPV_Production_System_Pro {
         if (!wp_next_scheduled('ipv_pro_auto_import_check')) {
             wp_schedule_event(time(), 'hourly', 'ipv_pro_auto_import_check');
         }
+
+        // Schedule cron for YouTube data updates
+        IPV_YouTube_Data_Updater::schedule_cron();
+
+        // Create error logs table for Logger
+        IPV_Pro_Logger::create_error_logs_table();
     }
 
     /**
@@ -194,6 +204,9 @@ class IPV_Production_System_Pro {
     public function deactivate() {
         wp_clear_scheduled_hook('ipv_pro_process_queue');
         wp_clear_scheduled_hook('ipv_pro_auto_import_check');
+
+        // Unschedule YouTube data updates
+        IPV_YouTube_Data_Updater::unschedule_cron();
     }
 
     /**
