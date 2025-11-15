@@ -39,6 +39,9 @@ class IPV_Tools_Advanced {
         add_action('wp_ajax_ipv_bulk_delete_drafts', [__CLASS__, 'ajax_bulk_delete_drafts']);
         add_action('wp_ajax_ipv_bulk_publish_all', [__CLASS__, 'ajax_bulk_publish_all']);
         add_action('wp_ajax_ipv_bulk_update_dates', [__CLASS__, 'ajax_bulk_update_dates']);
+        add_action('wp_ajax_ipv_check_orphan_videos', [__CLASS__, 'ajax_check_orphan_videos']);
+        add_action('wp_ajax_ipv_delete_orphan_videos', [__CLASS__, 'ajax_delete_orphan_videos']);
+        add_action('wp_ajax_ipv_repair_orphan_videos', [__CLASS__, 'ajax_repair_orphan_videos']);
     }
 
     public static function add_menu() {
@@ -58,6 +61,7 @@ class IPV_Tools_Advanced {
         $cache_size = self::get_cache_size();
         $db_info = self::get_db_info();
         $media_info = self::get_media_info();
+        $orphan_videos_info = self::get_orphan_videos_info();
 
         ?>
         <div class="wrap ipv-tools-advanced">
@@ -141,6 +145,44 @@ class IPV_Tools_Advanced {
                         </div>
 
                         <div id="db-status" class="ipv-tool-status"></div>
+                    </div>
+                </div>
+
+                <!-- Orphan Videos Checker (NEW!) -->
+                <div class="ipv-tool-card">
+                    <div class="ipv-tool-header">
+                        <span class="dashicons dashicons-video-alt3"></span>
+                        <h2>Video Orfani/Invisibili</h2>
+                    </div>
+                    <div class="ipv-tool-body">
+                        <p>Trova e gestisci video importati precedentemente ma non visibili nella lista Video Manager.</p>
+
+                        <div class="ipv-db-info">
+                            <div><strong>Video in Queue:</strong> <?php echo $orphan_videos_info['in_queue']; ?></div>
+                            <div><strong>Video Post Totali:</strong> <?php echo $orphan_videos_info['total_posts']; ?></div>
+                            <div><strong>Video Orfani:</strong> <span style="color: #d63638; font-weight: bold;"><?php echo $orphan_videos_info['orphans']; ?></span></div>
+                        </div>
+
+                        <?php if ($orphan_videos_info['orphans'] > 0): ?>
+                            <div class="notice notice-warning inline" style="margin: 10px 0;">
+                                <p>⚠️ <strong><?php echo $orphan_videos_info['orphans']; ?> video non visibili</strong> nella lista Video Manager ma presenti nel database!</p>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="ipv-tool-actions">
+                            <button class="button button-primary" id="ipv-check-orphan-videos">
+                                <span class="dashicons dashicons-search"></span> Trova Video Orfani
+                            </button>
+                            <button class="button button-secondary" id="ipv-repair-orphan-videos" <?php echo $orphan_videos_info['orphans'] == 0 ? 'disabled' : ''; ?>>
+                                <span class="dashicons dashicons-admin-tools"></span> Ripara (Riassocia)
+                            </button>
+                            <button class="button button-link-delete" id="ipv-delete-orphan-videos" <?php echo $orphan_videos_info['orphans'] == 0 ? 'disabled' : ''; ?>>
+                                <span class="dashicons dashicons-trash"></span> Elimina Tutti
+                            </button>
+                        </div>
+
+                        <div id="orphan-videos-status" class="ipv-tool-status"></div>
+                        <div id="orphan-videos-results" class="ipv-orphan-videos-results"></div>
                     </div>
                 </div>
 
@@ -647,6 +689,167 @@ class IPV_Tools_Advanced {
     }
 
     /**
+     * Check for orphan videos (posts not in queue)
+     */
+    public static function ajax_check_orphan_videos() {
+        global $wpdb;
+
+        $queue_table = $wpdb->prefix . 'ipv_processing_queue';
+
+        // Find posts that are NOT in the queue
+        $orphan_posts = $wpdb->get_results("
+            SELECT p.ID, p.post_title, p.post_status, p.post_date
+            FROM {$wpdb->posts} p
+            LEFT JOIN {$queue_table} q ON p.ID = q.post_id
+            WHERE p.post_type = 'ipv_video'
+            AND q.id IS NULL
+            ORDER BY p.post_date DESC
+            LIMIT 50
+        ");
+
+        if (empty($orphan_posts)) {
+            wp_send_json_success([
+                'message' => '✅ Nessun video orfano trovato! Tutti i video sono nella queue.',
+                'html' => ''
+            ]);
+            return;
+        }
+
+        $html = '<div class="ipv-orphan-videos-list">';
+        $html .= '<h3>📹 Video Orfani Trovati (' . count($orphan_posts) . ')</h3>';
+        $html .= '<table class="wp-list-table widefat fixed striped">';
+        $html .= '<thead><tr>';
+        $html .= '<th>ID</th>';
+        $html .= '<th>Titolo</th>';
+        $html .= '<th>Stato</th>';
+        $html .= '<th>Data</th>';
+        $html .= '<th>Azione</th>';
+        $html .= '</tr></thead><tbody>';
+
+        foreach ($orphan_posts as $post) {
+            $status_label = $post->post_status === 'publish' ? '✅ Pubblicato' : '📝 Bozza';
+            $edit_link = get_edit_post_link($post->ID);
+
+            $html .= '<tr>';
+            $html .= '<td>' . $post->ID . '</td>';
+            $html .= '<td><strong>' . esc_html($post->post_title) . '</strong></td>';
+            $html .= '<td>' . $status_label . '</td>';
+            $html .= '<td>' . date('d/m/Y H:i', strtotime($post->post_date)) . '</td>';
+            $html .= '<td><a href="' . $edit_link . '" class="button button-small" target="_blank">Modifica</a></td>';
+            $html .= '</tr>';
+        }
+
+        $html .= '</tbody></table>';
+        $html .= '</div>';
+
+        wp_send_json_success([
+            'message' => '⚠️ Trovati ' . count($orphan_posts) . ' video orfani! Questi video esistono come post ma non sono nella queue.',
+            'html' => $html,
+            'count' => count($orphan_posts)
+        ]);
+    }
+
+    /**
+     * Delete orphan videos permanently
+     */
+    public static function ajax_delete_orphan_videos() {
+        global $wpdb;
+
+        $queue_table = $wpdb->prefix . 'ipv_processing_queue';
+
+        // Find orphan posts
+        $orphan_ids = $wpdb->get_col("
+            SELECT p.ID
+            FROM {$wpdb->posts} p
+            LEFT JOIN {$queue_table} q ON p.ID = q.post_id
+            WHERE p.post_type = 'ipv_video'
+            AND q.id IS NULL
+        ");
+
+        if (empty($orphan_ids)) {
+            wp_send_json_success(['message' => 'Nessun video orfano da eliminare.']);
+            return;
+        }
+
+        $deleted = 0;
+        foreach ($orphan_ids as $post_id) {
+            if (wp_delete_post($post_id, true)) { // true = force delete (bypass trash)
+                $deleted++;
+            }
+        }
+
+        wp_send_json_success([
+            'message' => "✅ Video orfani eliminati! ({$deleted} video rimossi definitivamente)",
+            'deleted' => $deleted
+        ]);
+    }
+
+    /**
+     * Repair orphan videos by re-adding them to queue
+     */
+    public static function ajax_repair_orphan_videos() {
+        global $wpdb;
+
+        $queue_table = $wpdb->prefix . 'ipv_processing_queue';
+
+        // Find orphan posts
+        $orphan_posts = $wpdb->get_results("
+            SELECT p.ID, p.post_title
+            FROM {$wpdb->posts} p
+            LEFT JOIN {$queue_table} q ON p.ID = q.post_id
+            WHERE p.post_type = 'ipv_video'
+            AND q.id IS NULL
+        ");
+
+        if (empty($orphan_posts)) {
+            wp_send_json_success(['message' => 'Nessun video orfano da riparare.']);
+            return;
+        }
+
+        $repaired = 0;
+        foreach ($orphan_posts as $post) {
+            // Get video URL from post meta
+            $video_url = get_post_meta($post->ID, '_ipv_video_url', true);
+
+            if (empty($video_url)) {
+                // Try to get video_id and reconstruct URL
+                $video_id = get_post_meta($post->ID, '_ipv_video_id', true);
+                if (!empty($video_id)) {
+                    $video_url = "https://www.youtube.com/watch?v={$video_id}";
+                }
+            }
+
+            if (empty($video_url)) {
+                continue; // Skip if no video URL
+            }
+
+            // Re-add to queue as completed (to make it visible)
+            $result = $wpdb->insert(
+                $queue_table,
+                [
+                    'post_id' => $post->ID,
+                    'video_url' => $video_url,
+                    'status' => 'completed',
+                    'current_step' => 'repair_restored',
+                    'retry_count' => 0,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ],
+                ['%d', '%s', '%s', '%s', '%d', '%s', '%s']
+            );
+
+            if ($result !== false) {
+                $repaired++;
+            }
+        }
+
+        wp_send_json_success([
+            'message' => "✅ Video riparati e riassociati alla queue! ({$repaired} video ora visibili nel Video Manager)",
+            'repaired' => $repaired
+        ]);
+    }
+
+    /**
      * =====================================================
      * HELPER FUNCTIONS
      * =====================================================
@@ -727,6 +930,26 @@ class IPV_Tools_Advanced {
             'total' => number_format($total),
             'orphans' => number_format($orphans),
             'size' => self::format_bytes($size)
+        ];
+    }
+
+    private static function get_orphan_videos_info() {
+        global $wpdb;
+
+        // Get total ipv_video posts
+        $total_posts = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'ipv_video'");
+
+        // Get posts in queue
+        $queue_table = $wpdb->prefix . 'ipv_processing_queue';
+        $in_queue = $wpdb->get_var("SELECT COUNT(DISTINCT post_id) FROM {$queue_table}");
+
+        // Orphan videos = posts without queue entry
+        $orphans = $total_posts - $in_queue;
+
+        return [
+            'total_posts' => (int)$total_posts,
+            'in_queue' => (int)$in_queue,
+            'orphans' => max(0, (int)$orphans) // Ensure no negative
         ];
     }
 
@@ -1274,6 +1497,50 @@ CSS;
                 navigator.clipboard.writeText(sc);
                 $(this).text('✓ Copiato!');
                 setTimeout(() => $(this).html('<span class="dashicons dashicons-admin-page"></span> Copia Shortcode'), 2000);
+            });
+
+            // Check Orphan Videos
+            $('#ipv-check-orphan-videos').on('click', function() {
+                showStatus('#orphan-videos-status', 'Ricerca video orfani in corso...', 'info');
+                $('#orphan-videos-results').html('');
+
+                $.post(ajaxurl, {action: 'ipv_check_orphan_videos'}, function(res) {
+                    showStatus('#orphan-videos-status', res.data.message, res.success ? (res.data.count > 0 ? 'error' : 'success') : 'error');
+                    if (res.data.html) {
+                        $('#orphan-videos-results').addClass('show').html(res.data.html);
+                    }
+                    if (res.data.count > 0) {
+                        $('#ipv-repair-orphan-videos, #ipv-delete-orphan-videos').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Repair Orphan Videos
+            $('#ipv-repair-orphan-videos').on('click', function() {
+                if (!confirm('Vuoi riassociare i video orfani alla queue? Diventeranno visibili nel Video Manager.')) return;
+
+                showStatus('#orphan-videos-status', 'Riparazione in corso...', 'info');
+
+                $.post(ajaxurl, {action: 'ipv_repair_orphan_videos'}, function(res) {
+                    showStatus('#orphan-videos-status', res.data.message, res.success ? 'success' : 'error');
+                    if (res.success) {
+                        setTimeout(function() { location.reload(); }, 2000);
+                    }
+                });
+            });
+
+            // Delete Orphan Videos
+            $('#ipv-delete-orphan-videos').on('click', function() {
+                if (!confirm('⚠️ ATTENZIONE! Sei sicuro di voler ELIMINARE DEFINITIVAMENTE tutti i video orfani?\n\nQuesta azione è IRREVERSIBILE e rimuoverà i post dal database!\n\nConfermi?')) return;
+
+                showStatus('#orphan-videos-status', 'Eliminazione in corso...', 'info');
+
+                $.post(ajaxurl, {action: 'ipv_delete_orphan_videos'}, function(res) {
+                    showStatus('#orphan-videos-status', res.data.message, res.success ? 'success' : 'error');
+                    if (res.success) {
+                        setTimeout(function() { location.reload(); }, 2000);
+                    }
+                });
             });
         });
         </script>

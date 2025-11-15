@@ -2,14 +2,26 @@
 /**
  * Plugin Name: IPV Production System Pro - ULTIMATE Edition
  * Plugin URI: https://ilpuntodivistachannel.com
- * Description: Sistema editoriale enterprise con Dashboard Ultimate, Tools Avanzati, RSS Auto-Taxonomy (categorie, relatori, tag automatici), controllo media duplicati/orfani, diagnostics, cache management, export/import config e molto altro.
- * Version: 2.3.1
+ * Description: Sistema editoriale enterprise con Dashboard Ultimate, Tools Avanzati, RSS Auto-Taxonomy (categorie, relatori, tag automatici), controllo media duplicati/orfani, diagnostics, cache management, export/import config, orphan videos detector e molto altro.
+ * Version: 2.3.2
  * Author: Daniele
  * Author URI: https://ilpuntodivistachannel.com
  * License: GPL-2.0+
  * Text Domain: ipv-production-pro
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ *
+ * CHANGELOG v2.3.2 - Orphan Videos Detector & Repair Tool
+ * ✅ Rilevamento automatico video orfani (post senza queue entry)
+ * ✅ Lista dettagliata video orfani con ID, titolo, stato, data
+ * ✅ Funzione "Ripara" - riassocia video orfani alla queue (li rende visibili)
+ * ✅ Funzione "Elimina" - rimozione definitiva video orfani dal database
+ * ✅ Statistiche in tempo reale: Video in Queue vs Video Post Totali
+ * ✅ Alert visivo quando ci sono video orfani
+ * ✅ Tool integrato in Advanced Tools per facile accesso
+ * ✅ Conferme di sicurezza per operazioni distruttive
+ * ✅ Auto-refresh dopo riparazione/eliminazione
+ * ✅ Risolve problema: "video importati precedentemente non visibili dopo aggiornamento plugin"
  *
  * CHANGELOG v2.3.1 - RSS Auto-Taxonomy System
  * ✅ Auto-import categorie canale YouTube → WordPress categories
@@ -38,7 +50,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('IPV_PRO_VERSION', '2.3.1');
+define('IPV_PRO_VERSION', '2.3.2');
 define('IPV_PRO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('IPV_PRO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('IPV_PRO_INCLUDES_DIR', IPV_PRO_PLUGIN_DIR . 'includes/');
