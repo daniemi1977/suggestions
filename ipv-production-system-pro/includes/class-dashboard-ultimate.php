@@ -20,7 +20,6 @@ class IPV_Dashboard_Ultimate {
     public static function init() {
         add_action('admin_menu', [__CLASS__, 'add_menu'], 5);
         add_action('admin_enqueue_scripts', [__CLASS__, 'enqueue_assets']);
-        add_action('wp_ajax_ipv_dashboard_stats', [__CLASS__, 'ajax_get_stats']);
         add_action('wp_ajax_ipv_recent_activity', [__CLASS__, 'ajax_recent_activity']);
     }
 
