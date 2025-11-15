@@ -352,7 +352,7 @@ class IPV_Queue_Manager {
      */
     private function finalize_post($post_id, $video_data, $ai_content) {
         // Build post content
-        $content = $this->build_post_content($video_data, $ai_content);
+        $content = $this->build_post_content($post_id, $video_data, $ai_content);
 
         // Get AI title or fallback to YouTube title
         $post_title = !empty($ai_content['title']) ? $ai_content['title'] : $video_data['title'];
@@ -437,38 +437,44 @@ class IPV_Queue_Manager {
     }
 
     /**
-     * Build final post content from all sections
+     * Build final post content from all sections (Notion-style format)
      */
-    private function build_post_content($video_data, $ai_content) {
+    private function build_post_content($post_id, $video_data, $ai_content) {
         $video_id = $video_data['video_id'];
+        $video_url = "https://www.youtube.com/watch?v={$video_id}";
 
+        // Get transcript
+        $transcript = get_post_meta($post_id, '_ipv_transcript', true);
+
+        // Build Notion-style markdown content
         $content = '';
 
-        // Video embed
-        $content .= "<!-- wp:embed {\"url\":\"https://www.youtube.com/watch?v={$video_id}\",\"type\":\"video\",\"providerNameSlug\":\"youtube\"} -->\n";
+        // Video embed (Gutenberg block)
+        $content .= "<!-- wp:embed {\"url\":\"{$video_url}\",\"type\":\"video\",\"providerNameSlug\":\"youtube\"} -->\n";
         $content .= "<figure class=\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube\">\n";
         $content .= "<div class=\"wp-block-embed__wrapper\">\n";
-        $content .= "https://www.youtube.com/watch?v={$video_id}\n";
+        $content .= "{$video_url}\n";
         $content .= "</div>\n";
         $content .= "</figure>\n";
         $content .= "<!-- /wp:embed -->\n\n";
 
+        $content .= "---\n\n";
+
+        // Video Info Box
+        $content .= "**🎬 Video URL:** [{$video_url}]({$video_url})\n";
+        $content .= "**📹 Video ID:** `{$video_id}`\n";
+        if (!empty($video_data['channel_title'])) {
+            $content .= "**📺 Canale:** {$video_data['channel_title']}\n";
+        }
+        if (!empty($video_data['duration'])) {
+            $content .= "**⏱️ Durata:** {$this->format_duration($video_data['duration'])}\n";
+        }
+        $content .= "\n---\n\n";
+
         // Description
         if (!empty($ai_content['description'])) {
+            $content .= "## 📝 Descrizione\n\n";
             $content .= $ai_content['description'] . "\n\n";
-        }
-
-        // Sponsor
-        if (!empty($ai_content['sponsor'])) {
-            $content .= "---\n\n";
-            $content .= $ai_content['sponsor'] . "\n\n";
-            $content .= "---\n\n";
-        }
-
-        // Timestamps
-        if (!empty($ai_content['timestamps'])) {
-            $content .= "## 📍 Capitoli del Video\n\n";
-            $content .= $ai_content['timestamps'] . "\n\n";
         }
 
         // Topics
@@ -477,13 +483,95 @@ class IPV_Queue_Manager {
             $content .= $ai_content['topics'] . "\n\n";
         }
 
-        // Use full AI content if available
-        if (!empty($ai_content['full_content'])) {
-            $content .= "\n\n---\n\n";
-            $content .= $ai_content['full_content'];
+        // Guests
+        if (!empty($ai_content['guests'])) {
+            $content .= "## 👥 Ospiti\n\n";
+            $content .= $ai_content['guests'] . "\n\n";
         }
 
+        // Timestamps
+        if (!empty($ai_content['timestamps'])) {
+            $content .= "## ⏱️ Capitoli del Video\n\n";
+            $content .= $ai_content['timestamps'] . "\n\n";
+        }
+
+        // Sponsor
+        if (!empty($ai_content['sponsor'])) {
+            $content .= "## 💼 Sponsor\n\n";
+            $content .= $ai_content['sponsor'] . "\n\n";
+        }
+
+        // Quotes
+        if (!empty($ai_content['quotes'])) {
+            $content .= "## 💬 Citazioni Principali\n\n";
+            $content .= $ai_content['quotes'] . "\n\n";
+        }
+
+        // Events
+        if (!empty($ai_content['eventi'])) {
+            $content .= "## 📅 Eventi Menzionati\n\n";
+            $content .= $ai_content['eventi'] . "\n\n";
+        }
+
+        // People Mentioned
+        if (!empty($ai_content['persone_menzionate'])) {
+            $content .= "## 👤 Persone Menzionate\n\n";
+            $content .= $ai_content['persone_menzionate'] . "\n\n";
+        }
+
+        // References
+        if (!empty($ai_content['references'])) {
+            $content .= "## 🔗 Riferimenti e Link\n\n";
+            $content .= $ai_content['references'] . "\n\n";
+        }
+
+        // Related Videos
+        if (!empty($ai_content['related_videos'])) {
+            $content .= "## 📺 Video Correlati\n\n";
+            $content .= $ai_content['related_videos'] . "\n\n";
+        }
+
+        // Full AI Content (if available and different from sections)
+        if (!empty($ai_content['full_content'])) {
+            $content .= "## 📄 Contenuto Completo\n\n";
+            $content .= $ai_content['full_content'] . "\n\n";
+        }
+
+        // TRANSCRIPT (always include if available)
+        if (!empty($transcript)) {
+            $content .= "---\n\n";
+            $content .= "## 📄 Trascrizione Completa\n\n";
+            $content .= "```\n";
+            $content .= $transcript . "\n";
+            $content .= "```\n\n";
+        }
+
+        $content .= "---\n\n";
+        $content .= "*Contenuto generato automaticamente dal sistema editoriale*\n";
+
         return $content;
+    }
+
+    /**
+     * Format duration from ISO 8601 to readable format
+     */
+    private function format_duration($duration) {
+        if (empty($duration)) {
+            return '—';
+        }
+
+        // Parse ISO 8601 duration (PT1H2M3S)
+        preg_match('/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/', $duration, $matches);
+
+        $hours = isset($matches[1]) ? (int)$matches[1] : 0;
+        $minutes = isset($matches[2]) ? (int)$matches[2] : 0;
+        $seconds = isset($matches[3]) ? (int)$matches[3] : 0;
+
+        if ($hours > 0) {
+            return sprintf('%d:%02d:%02d', $hours, $minutes, $seconds);
+        } else {
+            return sprintf('%d:%02d', $minutes, $seconds);
+        }
     }
 
     /**
