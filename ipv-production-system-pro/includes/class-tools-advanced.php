@@ -49,7 +49,7 @@ class IPV_Tools_Advanced {
 
     public static function add_menu() {
         add_submenu_page(
-            'edit.php?post_type=ipv_video',
+            'ipv-production-pro',
             __('Tools Avanzati', 'ipv-production-pro'),
             __('🛠️ Tools Avanzati', 'ipv-production-pro'),
             'manage_options',

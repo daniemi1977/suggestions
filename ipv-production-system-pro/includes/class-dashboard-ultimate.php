@@ -25,7 +25,7 @@ class IPV_Dashboard_Ultimate {
 
     public static function add_menu() {
         add_submenu_page(
-            'edit.php?post_type=ipv_video',
+            'ipv-production-pro',
             __('Dashboard Ultimate', 'ipv-production-pro'),
             __('📊 Dashboard Ultimate', 'ipv-production-pro'),
             'manage_options',
