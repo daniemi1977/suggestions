@@ -32,6 +32,7 @@ spl_autoload_register(function($class) {
 // Load required classes
 require_once CWAU_PATH . 'includes/class-database.php';
 require_once CWAU_PATH . 'includes/class-rag.php';
+require_once CWAU_PATH . 'includes/class-rich-messages.php';
 require_once CWAU_PATH . 'includes/class-chat.php';
 require_once CWAU_PATH . 'includes/class-admin.php';
 require_once CWAU_PATH . 'includes/class-analytics.php';
@@ -83,6 +84,12 @@ class CWAU_Plugin {
         // E-commerce
         add_action('wp_ajax_cwau_search_products', array('CWAU_Ecommerce', 'search_products'));
         add_action('wp_ajax_nopriv_cwau_search_products', array('CWAU_Ecommerce', 'search_products'));
+        add_action('wp_ajax_cwau_add_to_cart', array('CWAU_Ecommerce', 'ajax_add_to_cart'));
+        add_action('wp_ajax_nopriv_cwau_add_to_cart', array('CWAU_Ecommerce', 'ajax_add_to_cart'));
+        add_action('wp_ajax_cwau_get_order_status', array('CWAU_Ecommerce', 'ajax_get_order_status'));
+        add_action('wp_ajax_nopriv_cwau_get_order_status', array('CWAU_Ecommerce', 'ajax_get_order_status'));
+        add_action('wp_ajax_cwau_notify_stock', array('CWAU_Ecommerce', 'ajax_notify_stock'));
+        add_action('wp_ajax_nopriv_cwau_notify_stock', array('CWAU_Ecommerce', 'ajax_notify_stock'));
 
         // Frontend
         add_shortcode('cwau_chat', array('CWAU_Chat', 'shortcode'));

@@ -122,4 +122,187 @@ class CWAU_Ecommerce {
 
         return $result;
     }
+
+    /**
+     * Add product to cart via AJAX
+     */
+    public static function ajax_add_to_cart() {
+        check_ajax_referer('cwau_chat_nonce', 'nonce');
+
+        $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
+        $quantity = isset($_POST['quantity']) ? absint($_POST['quantity']) : 1;
+        $variation_id = isset($_POST['variation_id']) ? absint($_POST['variation_id']) : 0;
+
+        if (!$product_id) {
+            wp_send_json_error(array('message' => 'ID prodotto non valido'));
+        }
+
+        // Check if WooCommerce cart is available
+        if (!function_exists('WC')) {
+            wp_send_json_error(array('message' => 'WooCommerce non disponibile'));
+        }
+
+        try {
+            // Add to cart
+            $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id);
+
+            if ($cart_item_key) {
+                $product = wc_get_product($product_id);
+                $cart_count = WC()->cart->get_cart_contents_count();
+                $cart_total = WC()->cart->get_cart_total();
+                $cart_url = wc_get_cart_url();
+
+                wp_send_json_success(array(
+                    'message' => '✓ ' . $product->get_name() . ' aggiunto al carrello!',
+                    'cart_count' => $cart_count,
+                    'cart_total' => $cart_total,
+                    'cart_url' => $cart_url,
+                    'product_name' => $product->get_name()
+                ));
+            } else {
+                wp_send_json_error(array('message' => 'Impossibile aggiungere il prodotto al carrello'));
+            }
+        } catch (Exception $e) {
+            wp_send_json_error(array('message' => $e->getMessage()));
+        }
+    }
+
+    /**
+     * Get order status via AJAX
+     */
+    public static function ajax_get_order_status() {
+        check_ajax_referer('cwau_chat_nonce', 'nonce');
+
+        $order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
+
+        if (!$order_id) {
+            // Try to get latest order for current user
+            if (is_user_logged_in()) {
+                $user_id = get_current_user_id();
+                $orders = wc_get_orders(array(
+                    'customer_id' => $user_id,
+                    'limit' => 1,
+                    'orderby' => 'date',
+                    'order' => 'DESC'
+                ));
+
+                if (!empty($orders)) {
+                    $order_id = $orders[0]->get_id();
+                }
+            }
+        }
+
+        if (!$order_id) {
+            wp_send_json_error(array('message' => 'Ordine non trovato. Per favore fornisci il numero dell\'ordine.'));
+        }
+
+        $order = wc_get_order($order_id);
+
+        if (!$order) {
+            wp_send_json_error(array('message' => 'Ordine #' . $order_id . ' non trovato.'));
+        }
+
+        // Check if user has permission to view this order
+        if (is_user_logged_in()) {
+            $user_id = get_current_user_id();
+            if ($order->get_customer_id() != $user_id && !current_user_can('manage_woocommerce')) {
+                wp_send_json_error(array('message' => 'Non hai i permessi per visualizzare questo ordine.'));
+            }
+        }
+
+        // Generate order status HTML using Rich Messages
+        $html = CWAU_Rich_Messages::order_status_card($order_id);
+
+        wp_send_json_success(array(
+            'html' => $html,
+            'order_id' => $order_id,
+            'status' => $order->get_status()
+        ));
+    }
+
+    /**
+     * Notify when product back in stock
+     */
+    public static function ajax_notify_stock() {
+        check_ajax_referer('cwau_chat_nonce', 'nonce');
+
+        $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
+        $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+
+        if (!$product_id) {
+            wp_send_json_error(array('message' => 'ID prodotto non valido'));
+        }
+
+        // If user is logged in, use their email
+        if (is_user_logged_in() && empty($email)) {
+            $user = wp_get_current_user();
+            $email = $user->user_email;
+        }
+
+        if (empty($email) || !is_email($email)) {
+            wp_send_json_error(array('message' => 'Email non valida. Per favore fornisci una email valida.'));
+        }
+
+        $product = wc_get_product($product_id);
+
+        if (!$product) {
+            wp_send_json_error(array('message' => 'Prodotto non trovato'));
+        }
+
+        // Save notification request
+        $existing = get_post_meta($product_id, '_stock_notifications', true);
+        if (!is_array($existing)) {
+            $existing = array();
+        }
+
+        // Check if email already registered
+        if (in_array($email, $existing)) {
+            wp_send_json_success(array(
+                'message' => '✓ Sei già registrato per ricevere notifiche per ' . $product->get_name()
+            ));
+            return;
+        }
+
+        $existing[] = $email;
+        update_post_meta($product_id, '_stock_notifications', $existing);
+
+        wp_send_json_success(array(
+            'message' => '✓ Perfetto! Ti invieremo una email quando ' . $product->get_name() . ' tornerà disponibile.'
+        ));
+    }
+
+    /**
+     * Get cart summary
+     */
+    public static function get_cart_summary() {
+        if (!function_exists('WC') || !WC()->cart) {
+            return array(
+                'count' => 0,
+                'total' => '€0.00',
+                'items' => array()
+            );
+        }
+
+        $cart_items = array();
+        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+            $product = $cart_item['data'];
+            $cart_items[] = array(
+                'key' => $cart_item_key,
+                'product_id' => $cart_item['product_id'],
+                'name' => $product->get_name(),
+                'quantity' => $cart_item['quantity'],
+                'price' => wc_price($product->get_price()),
+                'image' => wp_get_attachment_image_url($product->get_image_id(), 'thumbnail')
+            );
+        }
+
+        return array(
+            'count' => WC()->cart->get_cart_contents_count(),
+            'total' => WC()->cart->get_cart_total(),
+            'subtotal' => WC()->cart->get_cart_subtotal(),
+            'items' => $cart_items,
+            'cart_url' => wc_get_cart_url(),
+            'checkout_url' => wc_get_checkout_url()
+        );
+    }
 }
