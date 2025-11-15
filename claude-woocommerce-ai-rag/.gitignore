@@ -1,0 +1,76 @@
+# WordPress
+.htaccess
+wp-config.php
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/cache/
+wp-content/cache/supercache/
+
+# WordPress Themes
+wp-content/themes/twenty*/
+
+# WordPress Plugins
+wp-content/plugins/hello.php
+
+# WordPress Files
+index.php
+license.txt
+readme.html
+wp-activate.php
+wp-blog-header.php
+wp-comments-post.php
+wp-config-sample.php
+wp-cron.php
+wp-links-opml.php
+wp-load.php
+wp-login.php
+wp-mail.php
+wp-settings.php
+wp-signup.php
+wp-trackback.php
+xmlrpc.php
+wp-admin/
+wp-includes/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+error_log
+debug.log
+
+# Dependencies
+node_modules/
+vendor/
+composer.lock
+package-lock.json
+
+# Build files
+*.min.css
+*.min.js
+dist/
+build/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Backup files
+*.sql
+*.tar.gz
+*.zip
+
+# Environment
+.env
+.env.local
