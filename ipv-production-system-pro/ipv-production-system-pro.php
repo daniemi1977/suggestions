@@ -2,14 +2,34 @@
 /**
  * Plugin Name: IPV Production System Pro - ULTIMATE Edition
  * Plugin URI: https://ilpuntodivistachannel.com
- * Description: Sistema editoriale enterprise con Dashboard Ultimate, Tools Avanzati, controllo media duplicati/orfani, diagnostics, cache management, export/import config e molto altro.
- * Version: 2.3.0
+ * Description: Sistema editoriale enterprise con Dashboard Ultimate, Tools Avanzati, RSS Auto-Taxonomy (categorie, relatori, tag automatici), controllo media duplicati/orfani, diagnostics, cache management, export/import config e molto altro.
+ * Version: 2.3.1
  * Author: Daniele
  * Author URI: https://ilpuntodivistachannel.com
  * License: GPL-2.0+
  * Text Domain: ipv-production-pro
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ *
+ * CHANGELOG v2.3.1 - RSS Auto-Taxonomy System
+ * ✅ Auto-import categorie canale YouTube → WordPress categories
+ * ✅ Auto-estrazione relatori/ospiti dal titolo → ipv_guest taxonomy + categories
+ * ✅ Auto-estrazione hashtags dalla description → WordPress tags
+ * ✅ Auto-estrazione topics dalla description → ipv_topic taxonomy
+ * ✅ Auto-assegnazione channel name → ipv_channel_theme taxonomy
+ * ✅ Pattern matching intelligente per speaker names (con/ft./feat./ospite/guest)
+ * ✅ Parsing avanzato RSS feed con tutti i metadati disponibili
+ * ✅ Taxonomy assignment BEFORE AI processing (early assignment)
+ * ✅ Logging dettagliato per debug e monitoring
+ *
+ * CHANGELOG v2.3.0 - ULTIMATE Edition
+ * ✅ Dashboard Ultimate con Chart.js (30-day analytics)
+ * ✅ Tools Avanzati: 16 enterprise tools
+ * ✅ Media Duplicates/Orphan Checker
+ * ✅ Export/Import Config, Cache Management, DB Optimizer
+ * ✅ Diagnostics Panel, API Testing, Log Viewer
+ * ✅ CSV Report Generator, Bulk Operations
+ * ✅ All buttons with working AJAX handlers (no placeholders)
  */
 
 // Exit if accessed directly
@@ -18,7 +38,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('IPV_PRO_VERSION', '2.3.0');
+define('IPV_PRO_VERSION', '2.3.1');
 define('IPV_PRO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('IPV_PRO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('IPV_PRO_INCLUDES_DIR', IPV_PRO_PLUGIN_DIR . 'includes/');

@@ -75,6 +75,7 @@ class IPV_RSS_Auto_Import {
 
     /**
      * Extract video data from feed entry
+     * Enhanced to extract categories, speakers, tags, and all available metadata
      */
     private function parse_feed_entry($entry) {
         // YouTube RSS uses Atom format with media namespace
@@ -85,15 +86,196 @@ class IPV_RSS_Auto_Import {
         $video_url = "https://www.youtube.com/watch?v={$video_id}";
         $title = (string)$entry->title;
         $published = (string)$entry->published;
+        $author = (string)$entry->author->name;
+
+        // Extract description from media:group
+        $description = '';
+        if (isset($media->group->description)) {
+            $description = (string)$media->group->description;
+        }
+
+        // Extract category from media:group
+        $category = '';
+        if (isset($media->group->category)) {
+            $category = (string)$media->group->category;
+        }
+
+        // Extract hashtags from description
+        $hashtags = $this->extract_hashtags($description);
+
+        // Extract speaker/guest names from title
+        $speakers = $this->extract_speakers_from_title($title);
+
+        // Extract topics/keywords from description (first sentence or key phrases)
+        $topics = $this->extract_topics_from_description($description);
+
+        // Get channel ID
+        $channel_id = isset($yt->channelId) ? (string)$yt->channelId : '';
+
+        // Get thumbnail (prefer maxres if available)
+        $thumbnail = '';
+        if (isset($media->group->thumbnail)) {
+            $thumbnail = (string)$media->group->thumbnail[0]->attributes()->url;
+        }
+
+        // Get statistics if available
+        $view_count = 0;
+        if (isset($media->group->community->statistics)) {
+            $stats = $media->group->community->statistics->attributes();
+            if (isset($stats['views'])) {
+                $view_count = (int)$stats['views'];
+            }
+        }
 
         return [
             'video_id' => $video_id,
             'video_url' => $video_url,
             'title' => $title,
+            'description' => $description,
             'published_at' => $published,
-            'author' => (string)$entry->author->name,
-            'thumbnail' => isset($media->group->thumbnail) ? (string)$media->group->thumbnail[0]->attributes()->url : ''
+            'author' => $author,
+            'channel_id' => $channel_id,
+            'category' => $category,
+            'thumbnail' => $thumbnail,
+            'view_count' => $view_count,
+            'hashtags' => $hashtags,
+            'speakers' => $speakers,
+            'topics' => $topics
         ];
+    }
+
+    /**
+     * Extract hashtags from text
+     */
+    private function extract_hashtags($text) {
+        if (empty($text)) {
+            return [];
+        }
+
+        // Match all hashtags (#word)
+        preg_match_all('/#(\w+)/u', $text, $matches);
+
+        if (empty($matches[1])) {
+            return [];
+        }
+
+        // Clean and filter hashtags
+        $hashtags = array_map('strtolower', $matches[1]);
+        $hashtags = array_unique($hashtags);
+        $hashtags = array_values($hashtags);
+
+        return $hashtags;
+    }
+
+    /**
+     * Extract speaker/guest names from video title
+     * Common patterns:
+     * - "con [Name]"
+     * - "ft. [Name]"
+     * - "feat. [Name]"
+     * - "featuring [Name]"
+     * - "ospite: [Name]"
+     * - "guest: [Name]"
+     * - "[Name] interview"
+     */
+    private function extract_speakers_from_title($title) {
+        if (empty($title)) {
+            return [];
+        }
+
+        $speakers = [];
+
+        // Pattern 1: "con [Name]"
+        if (preg_match('/\bcon\s+([A-Z][a-zA-ZÀ-ÿ\s]+?)(?:\s*[\|\-]|$)/u', $title, $matches)) {
+            $speakers[] = trim($matches[1]);
+        }
+
+        // Pattern 2: "ft. [Name]" or "feat. [Name]"
+        if (preg_match('/\b(?:ft\.|feat\.|featuring)\s+([A-Z][a-zA-ZÀ-ÿ\s]+?)(?:\s*[\|\-]|$)/u', $title, $matches)) {
+            $speakers[] = trim($matches[1]);
+        }
+
+        // Pattern 3: "ospite: [Name]" or "guest: [Name]" (improved)
+        if (preg_match('/\b(?:ospite|guest):\s*([A-Z][a-zA-ZÀ-ÿ]+(?:\s+[A-Z][a-zA-ZÀ-ÿ]+)*)/ui', $title, $matches)) {
+            $speakers[] = trim($matches[1]);
+        }
+
+        // Pattern 4: "[Name] - Interview" or "[Name] Interview"
+        if (preg_match('/^([A-Z][a-zA-ZÀ-ÿ\s]+?)\s*[\-\:]?\s*Interview/ui', $title, $matches)) {
+            $speakers[] = trim($matches[1]);
+        }
+
+        // Clean duplicates and filter out common words
+        $speakers = array_unique($speakers);
+        $speakers = array_filter($speakers, function($name) {
+            // Remove if contains common stopwords or too short
+            $stopwords = ['on', 'about', 'in', 'the', 'a', 'an'];
+            $words = explode(' ', strtolower($name));
+            return strlen($name) > 3 && !in_array($words[0], $stopwords);
+        });
+        $speakers = array_values($speakers);
+
+        return $speakers;
+    }
+
+    /**
+     * Extract topics/keywords from description
+     * Takes first meaningful sentences and common topic indicators
+     */
+    private function extract_topics_from_description($description) {
+        if (empty($description)) {
+            return [];
+        }
+
+        $topics = [];
+
+        // Extract lines that start with topic markers
+        $lines = explode("\n", $description);
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            // Look for lines that indicate topics
+            if (preg_match('/^(?:Argomenti?|Topics?|Temi?|In questo video):\s*(.+)/i', $line, $matches)) {
+                // Get the matched content and remove newlines/hashtags
+                $content = preg_replace('/\n.*$/', '', $matches[1]); // Remove everything after first newline
+                $content = preg_replace('/#\w+/', '', $content); // Remove hashtags
+
+                // Split by comma, semicolon, or bullet
+                $items = preg_split('/[,;•]+/', $content);
+                foreach ($items as $item) {
+                    $item = trim($item);
+                    if (!empty($item) && strlen($item) > 3 && strlen($item) < 100) {
+                        $topics[] = $item;
+                    }
+                }
+            }
+        }
+
+        // If no explicit topics found, try to extract from first sentences
+        if (empty($topics)) {
+            // Get first 200 chars, split by periods
+            $excerpt = substr($description, 0, 200);
+            $sentences = explode('.', $excerpt);
+
+            if (!empty($sentences[0])) {
+                // Look for noun phrases (capitalized words of 3+ letters)
+                preg_match_all('/\b([A-Z][a-zA-ZÀ-ÿ]{2,}(?:\s+[A-Z][a-zA-ZÀ-ÿ]{2,})*)\b/', $sentences[0], $matches);
+
+                if (!empty($matches[1])) {
+                    $topics = array_slice($matches[1], 0, 5); // Max 5 topics
+                }
+            }
+        }
+
+        // Clean and deduplicate
+        $topics = array_unique($topics);
+        $topics = array_filter($topics, function($topic) {
+            return strlen($topic) > 3 && strlen($topic) < 100;
+        });
+        $topics = array_values($topics);
+
+        return $topics;
     }
 
     /**
@@ -160,8 +342,8 @@ class IPV_RSS_Auto_Import {
                 continue;
             }
 
-            // Add to queue
-            $result = $queue_manager->add_to_queue($video_data['video_url']);
+            // Add to queue with RSS metadata
+            $result = $queue_manager->add_to_queue($video_data['video_url'], $video_data);
 
             if (is_wp_error($result)) {
                 $errors++;
@@ -173,9 +355,11 @@ class IPV_RSS_Auto_Import {
             } else {
                 $imported++;
                 error_log(sprintf(
-                    '[IPV Auto-Import] Imported: %s (Queue ID: %d)',
+                    '[IPV Auto-Import] Imported: %s (Queue ID: %d) - Speakers: %s, Hashtags: %s',
                     $video_data['title'],
-                    $result
+                    $result,
+                    !empty($video_data['speakers']) ? implode(', ', $video_data['speakers']) : 'none',
+                    !empty($video_data['hashtags']) ? implode(', ', $video_data['hashtags']) : 'none'
                 ));
             }
         }

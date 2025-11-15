@@ -47,9 +47,10 @@ class IPV_Queue_Manager {
      * Add video to queue
      *
      * @param string $video_url YouTube video URL
+     * @param array $rss_metadata Optional RSS feed metadata (categories, speakers, hashtags, etc.)
      * @return int|WP_Error Queue item ID or error
      */
-    public function add_to_queue($video_url) {
+    public function add_to_queue($video_url, $rss_metadata = []) {
         global $wpdb;
 
         // Validate URL
@@ -81,7 +82,7 @@ class IPV_Queue_Manager {
 
         // Create draft post with CPT ipv_video
         $post_id = wp_insert_post([
-            'post_title' => 'Video YouTube (processing...)',
+            'post_title' => !empty($rss_metadata['title']) ? $rss_metadata['title'] : 'Video YouTube (processing...)',
             'post_status' => 'draft',
             'post_type' => 'ipv_video'
         ]);
@@ -115,6 +116,14 @@ class IPV_Queue_Manager {
         update_post_meta($post_id, '_ipv_video_id', $video_id);
         update_post_meta($post_id, '_ipv_processing_status', 'pending');
         update_post_meta($post_id, '_ipv_queue_id', $wpdb->insert_id);
+
+        // Save RSS metadata if provided
+        if (!empty($rss_metadata)) {
+            update_post_meta($post_id, '_ipv_rss_metadata', $rss_metadata);
+
+            // Apply early taxonomy assignment from RSS data
+            $this->apply_taxonomies_from_rss($post_id, $rss_metadata);
+        }
 
         return $wpdb->insert_id;
     }
@@ -434,6 +443,84 @@ class IPV_Queue_Manager {
         $items = array_unique($items);
 
         return array_values($items);
+    }
+
+    /**
+     * Apply taxonomies from RSS feed metadata (early assignment)
+     * This runs BEFORE full YouTube API import and AI processing
+     *
+     * @param int $post_id WordPress post ID
+     * @param array $rss_metadata RSS feed data (speakers, hashtags, topics, category)
+     */
+    private function apply_taxonomies_from_rss($post_id, $rss_metadata) {
+        // Assign speakers/guests to ipv_guest taxonomy AND categories
+        if (!empty($rss_metadata['speakers']) && is_array($rss_metadata['speakers'])) {
+            $speakers = $rss_metadata['speakers'];
+
+            // Assign to ipv_guest taxonomy
+            wp_set_object_terms($post_id, $speakers, 'ipv_guest', false);
+
+            // Also create/assign WordPress categories for speakers
+            $speaker_cat_ids = [];
+            foreach ($speakers as $speaker) {
+                $cat = get_term_by('name', $speaker, 'category');
+                if (!$cat) {
+                    // Create category if doesn't exist
+                    $result = wp_insert_term($speaker, 'category');
+                    if (!is_wp_error($result)) {
+                        $speaker_cat_ids[] = $result['term_id'];
+                    }
+                } else {
+                    $speaker_cat_ids[] = $cat->term_id;
+                }
+            }
+
+            if (!empty($speaker_cat_ids)) {
+                wp_set_post_categories($post_id, $speaker_cat_ids, true); // true = append
+            }
+        }
+
+        // Assign topics to ipv_topic taxonomy
+        if (!empty($rss_metadata['topics']) && is_array($rss_metadata['topics'])) {
+            wp_set_object_terms($post_id, $rss_metadata['topics'], 'ipv_topic', false);
+        }
+
+        // Assign hashtags to WordPress tags
+        if (!empty($rss_metadata['hashtags']) && is_array($rss_metadata['hashtags'])) {
+            wp_set_post_tags($post_id, $rss_metadata['hashtags'], false);
+        }
+
+        // Assign RSS category to WordPress category
+        if (!empty($rss_metadata['category'])) {
+            $category = $rss_metadata['category'];
+
+            // Try to find or create category
+            $cat = get_term_by('name', $category, 'category');
+            if (!$cat) {
+                // Create category if doesn't exist
+                $result = wp_insert_term($category, 'category');
+                if (!is_wp_error($result)) {
+                    wp_set_post_categories($post_id, [$result['term_id']], true); // append
+                }
+            } else {
+                wp_set_post_categories($post_id, [$cat->term_id], true); // append
+            }
+        }
+
+        // Assign channel name to ipv_channel_theme taxonomy
+        if (!empty($rss_metadata['author'])) {
+            wp_set_object_terms($post_id, [$rss_metadata['author']], 'ipv_channel_theme', false);
+        }
+
+        // Log taxonomy assignment
+        error_log(sprintf(
+            '[IPV RSS Auto-Taxonomy] Post %d - Assigned: Speakers=%d, Topics=%d, Tags=%d, Categories=%s',
+            $post_id,
+            !empty($rss_metadata['speakers']) ? count($rss_metadata['speakers']) : 0,
+            !empty($rss_metadata['topics']) ? count($rss_metadata['topics']) : 0,
+            !empty($rss_metadata['hashtags']) ? count($rss_metadata['hashtags']) : 0,
+            !empty($rss_metadata['category']) ? $rss_metadata['category'] : 'none'
+        ));
     }
 
     /**
