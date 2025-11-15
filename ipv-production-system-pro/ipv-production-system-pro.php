@@ -3,13 +3,40 @@
  * Plugin Name: IPV Production System Pro - ULTIMATE Edition
  * Plugin URI: https://ilpuntodivistachannel.com
  * Description: Sistema editoriale enterprise con Dashboard Ultimate, Tools Avanzati, RSS Auto-Taxonomy (categorie, relatori, tag automatici), controllo media duplicati/orfani, diagnostics, cache management, export/import config, orphan videos detector e molto altro.
- * Version: 2.3.3
+ * Version: 2.4.0
  * Author: Daniele
  * Author URI: https://ilpuntodivistachannel.com
  * License: GPL-2.0+
  * Text Domain: ipv-production-pro
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ *
+ * CHANGELOG v2.4.0 - BULK REIMPORT System + Fix Video Invisibili
+ * ✅ **BULK REIMPORT SYSTEM** - Reimporta massivamente tutti i video:
+ *    • Trascrizioni - Re-download da SupaData API (sovrascrive esistenti)
+ *    • Thumbnails - Re-download da YouTube (maxresdefault, hqdefault, mqdefault)
+ *    • Descrizioni AI - Rigenera con OpenAI
+ *    • Metadata YouTube - Re-fetch titoli, durata, views, likes
+ *    • Seleziona cosa reimportare con checkbox
+ *    • Progress bar in tempo reale
+ *    • Pulsante STOP per interrompere
+ *    • Statistiche finali: successi/errori
+ *    • Processa un video alla volta (no timeout)
+ * ✅ **FIX Video Invisibili** - Risolve problema video non visibili nel Video Manager:
+ *    • Trova video orphan (post senza queue entry)
+ *    • Ripara button per riassociarli alla queue
+ *    • Delete button per eliminarli definitivamente
+ *    • Lista dettagliata con ID, titolo, stato
+ * ✅ **UI/UX Miglioramenti**:
+ *    • Sezione "Video Orfani/Invisibili + BULK REIMPORT" ampliata (ipv-tool-wide)
+ *    • Tempo stimato per bulk reimport
+ *    • Messaggi di conferma chiari
+ *    • Auto-reload dopo completamento
+ *
+ * RISOLVE DEFINITIVAMENTE:
+ * ❌ "NON HAI RISOLTO NIENTE - nel menu non compare nessun video"
+ * ❌ "non ho i tools bulk per cancellare tutti i video per reimportare tutte le trascrizioni o i thumbs o le descrizioni"
+ * ✅ ORA HAI: Ripara video orfani + BULK REIMPORT completo!
  *
  * CHANGELOG v2.3.3 - Auto-Repair Orphan Videos System
  * ✅ Sistema automatico di riparazione video orfani
@@ -85,7 +112,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('IPV_PRO_VERSION', '2.3.2');
+define('IPV_PRO_VERSION', '2.4.0');
 define('IPV_PRO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('IPV_PRO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('IPV_PRO_INCLUDES_DIR', IPV_PRO_PLUGIN_DIR . 'includes/');

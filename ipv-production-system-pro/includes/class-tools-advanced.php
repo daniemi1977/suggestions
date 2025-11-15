@@ -43,6 +43,8 @@ class IPV_Tools_Advanced {
         add_action('wp_ajax_ipv_delete_orphan_videos', [__CLASS__, 'ajax_delete_orphan_videos']);
         add_action('wp_ajax_ipv_repair_orphan_videos', [__CLASS__, 'ajax_repair_orphan_videos']);
         add_action('wp_ajax_ipv_deep_clean_database', [__CLASS__, 'ajax_deep_clean_database']);
+        add_action('wp_ajax_ipv_bulk_reimport_video', [__CLASS__, 'ajax_bulk_reimport_video']);
+        add_action('wp_ajax_ipv_get_bulk_reimport_queue', [__CLASS__, 'ajax_get_bulk_reimport_queue']);
     }
 
     public static function add_menu() {
@@ -149,14 +151,14 @@ class IPV_Tools_Advanced {
                     </div>
                 </div>
 
-                <!-- Orphan Videos Checker (NEW!) -->
-                <div class="ipv-tool-card">
+                <!-- Orphan Videos Checker + BULK REIMPORT TOOLS -->
+                <div class="ipv-tool-card ipv-tool-wide">
                     <div class="ipv-tool-header">
                         <span class="dashicons dashicons-video-alt3"></span>
-                        <h2>Video Orfani/Invisibili</h2>
+                        <h2>Video Orfani/Invisibili + BULK REIMPORT</h2>
                     </div>
                     <div class="ipv-tool-body">
-                        <p>Trova e gestisci video importati precedentemente ma non visibili nella lista Video Manager.</p>
+                        <p>Trova e gestisci video importati precedentemente ma non visibili nella lista Video Manager. <strong>NUOVO:</strong> Reimporta massivamente trascrizioni, thumbnails e descrizioni!</p>
 
                         <div class="ipv-db-info">
                             <div><strong>Video in Queue:</strong> <?php echo $orphan_videos_info['in_queue']; ?></div>
@@ -170,12 +172,13 @@ class IPV_Tools_Advanced {
                             </div>
                         <?php endif; ?>
 
+                        <h3 style="margin: 20px 0 10px 0;">🔍 Trova e Ripara Video Orfani</h3>
                         <div class="ipv-tool-actions">
                             <button class="button button-primary" id="ipv-check-orphan-videos">
                                 <span class="dashicons dashicons-search"></span> Trova Video Orfani
                             </button>
                             <button class="button button-secondary" id="ipv-repair-orphan-videos" <?php echo $orphan_videos_info['orphans'] == 0 ? 'disabled' : ''; ?>>
-                                <span class="dashicons dashicons-admin-tools"></span> Ripara (Riassocia)
+                                <span class="dashicons dashicons-admin-tools"></span> Ripara (Riassocia alla Queue)
                             </button>
                             <button class="button button-link-delete" id="ipv-delete-orphan-videos" <?php echo $orphan_videos_info['orphans'] == 0 ? 'disabled' : ''; ?>>
                                 <span class="dashicons dashicons-trash"></span> Elimina Tutti
@@ -184,6 +187,62 @@ class IPV_Tools_Advanced {
 
                         <div id="orphan-videos-status" class="ipv-tool-status"></div>
                         <div id="orphan-videos-results" class="ipv-orphan-videos-results"></div>
+
+                        <hr style="margin: 30px 0; border: none; border-top: 2px solid #ddd;">
+
+                        <h3 style="margin: 20px 0 10px 0;">🔄 BULK REIMPORT - Tutti i Video nella Queue</h3>
+                        <p style="margin-bottom: 15px;">Reimporta massivamente dati per TUTTI i video presenti nella queue. Utile dopo aggiornamenti del plugin o per aggiornare dati obsoleti.</p>
+
+                        <div class="ipv-bulk-reimport-options" style="background: #f9f9f9; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                            <p style="font-weight: bold; margin: 0 0 10px 0;">Seleziona cosa reimportare:</p>
+                            <label style="display: block; margin: 5px 0;">
+                                <input type="checkbox" id="bulk-reimport-transcripts" checked>
+                                <strong>Trascrizioni</strong> - Re-download da SupaData API (sovrascrive esistenti)
+                            </label>
+                            <label style="display: block; margin: 5px 0;">
+                                <input type="checkbox" id="bulk-reimport-thumbnails" checked>
+                                <strong>Thumbnails</strong> - Re-download da YouTube (maxresdefault, hqdefault, mqdefault)
+                            </label>
+                            <label style="display: block; margin: 5px 0;">
+                                <input type="checkbox" id="bulk-reimport-descriptions" checked>
+                                <strong>Descrizioni AI</strong> - Rigenera con OpenAI (solo se hai trascrizioni)
+                            </label>
+                            <label style="display: block; margin: 5px 0;">
+                                <input type="checkbox" id="bulk-reimport-metadata" checked>
+                                <strong>Metadata YouTube</strong> - Re-fetch titoli, durata, views, likes (YouTube API)
+                            </label>
+
+                            <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-left: 4px solid #856404;">
+                                <p style="margin: 0; font-size: 13px;">
+                                    <strong>⏱️ Tempo stimato:</strong> ~3-5 secondi per video (dipende dalle API).
+                                    Per <?php echo $orphan_videos_info['in_queue']; ?> video in queue: ~<?php echo ceil($orphan_videos_info['in_queue'] * 4 / 60); ?> minuti.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="ipv-tool-actions">
+                            <button class="button button-large button-primary" id="ipv-bulk-reimport-all" style="height: 40px;">
+                                <span class="dashicons dashicons-update"></span>
+                                AVVIA BULK REIMPORT (<?php echo $orphan_videos_info['in_queue']; ?> video)
+                            </button>
+                            <button class="button button-large" id="ipv-stop-bulk-reimport" style="height: 40px; display: none;">
+                                <span class="dashicons dashicons-no"></span>
+                                STOP
+                            </button>
+                        </div>
+
+                        <div id="bulk-reimport-status" class="ipv-tool-status"></div>
+                        <div id="bulk-reimport-progress" style="display: none; margin: 20px 0;">
+                            <div style="background: #f0f0f1; height: 30px; border-radius: 4px; overflow: hidden; position: relative;">
+                                <div id="bulk-reimport-progress-bar" style="background: linear-gradient(90deg, #2271b1, #135e96); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px;">
+                                    0%
+                                </div>
+                            </div>
+                            <p id="bulk-reimport-progress-text" style="margin: 10px 0; text-align: center; font-weight: bold;">
+                                Inizializzazione...
+                            </p>
+                        </div>
+                        <div id="bulk-reimport-results" class="ipv-bulk-reimport-results"></div>
                     </div>
                 </div>
 
@@ -1047,6 +1106,209 @@ class IPV_Tools_Advanced {
     }
 
     /**
+     * Get queue for bulk reimport
+     * Returns all video IDs in the processing queue
+     */
+    public static function ajax_get_bulk_reimport_queue() {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Non autorizzato!']);
+            return;
+        }
+
+        global $wpdb;
+        $queue_table = $wpdb->prefix . 'ipv_processing_queue';
+
+        // Get all videos in queue
+        $video_ids = $wpdb->get_col("
+            SELECT post_id
+            FROM {$queue_table}
+            WHERE post_id IS NOT NULL
+            ORDER BY id DESC
+        ");
+
+        if (empty($video_ids)) {
+            wp_send_json_error(['message' => 'Nessun video nella queue da reimportare.']);
+            return;
+        }
+
+        wp_send_json_success([
+            'video_ids' => $video_ids,
+            'total' => count($video_ids),
+            'message' => sprintf('Trovati %d video da reimportare.', count($video_ids))
+        ]);
+    }
+
+    /**
+     * Bulk reimport single video
+     * Processes one video at a time (called repeatedly from JS)
+     */
+    public static function ajax_bulk_reimport_video() {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Non autorizzato!']);
+            return;
+        }
+
+        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+        $options = isset($_POST['options']) ? $_POST['options'] : [];
+
+        if (!$post_id) {
+            wp_send_json_error(['message' => 'Post ID mancante!']);
+            return;
+        }
+
+        // Verify post exists and is ipv_video type
+        $post = get_post($post_id);
+        if (!$post || $post->post_type !== 'ipv_video') {
+            wp_send_json_error(['message' => "Post #{$post_id} non è un video IPV!"]);
+            return;
+        }
+
+        $video_id = get_post_meta($post_id, '_ipv_video_id', true);
+        $video_url = get_post_meta($post_id, '_ipv_video_url', true);
+
+        if (empty($video_id) || empty($video_url)) {
+            wp_send_json_error(['message' => "Post #{$post_id}: mancano video_id o video_url!"]);
+            return;
+        }
+
+        $results = [];
+        $errors = [];
+
+        // Initialize APIs
+        $youtube_api = new IPV_YouTube_API();
+        $supadata_api = new IPV_SupaData_API();
+        $openai_api = new IPV_OpenAI_API();
+
+        // OPTION 1: Reimport Metadata from YouTube
+        if (!empty($options['metadata'])) {
+            try {
+                $metadata = $youtube_api->get_video_info($video_url);
+
+                if (!is_wp_error($metadata)) {
+                    // Update post title
+                    wp_update_post([
+                        'ID' => $post_id,
+                        'post_title' => $metadata['title']
+                    ]);
+
+                    // Update meta fields
+                    update_post_meta($post_id, '_ipv_duration', $metadata['duration']);
+                    update_post_meta($post_id, '_ipv_view_count', $metadata['view_count']);
+                    update_post_meta($post_id, '_ipv_like_count', $metadata['like_count']);
+                    update_post_meta($post_id, '_ipv_channel_title', $metadata['channel_title']);
+                    update_post_meta($post_id, '_ipv_published_at', $metadata['published_at']);
+
+                    $results['metadata'] = '✅ Metadata aggiornati';
+                } else {
+                    $errors[] = 'Metadata: ' . $metadata->get_error_message();
+                }
+            } catch (Exception $e) {
+                $errors[] = 'Metadata: ' . $e->getMessage();
+            }
+        }
+
+        // OPTION 2: Reimport Thumbnail
+        if (!empty($options['thumbnails'])) {
+            try {
+                $thumbnail_url = $youtube_api->get_best_thumbnail($video_id);
+
+                if ($thumbnail_url) {
+                    // Download and set as featured image
+                    require_once(ABSPATH . 'wp-admin/includes/media.php');
+                    require_once(ABSPATH . 'wp-admin/includes/file.php');
+                    require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+                    $thumbnail_id = media_sideload_image($thumbnail_url, $post_id, $post->post_title, 'id');
+
+                    if (!is_wp_error($thumbnail_id)) {
+                        set_post_thumbnail($post_id, $thumbnail_id);
+                        $results['thumbnails'] = '✅ Thumbnail aggiornata';
+                    } else {
+                        $errors[] = 'Thumbnail: ' . $thumbnail_id->get_error_message();
+                    }
+                } else {
+                    $errors[] = 'Thumbnail: URL non disponibile';
+                }
+            } catch (Exception $e) {
+                $errors[] = 'Thumbnail: ' . $e->getMessage();
+            }
+        }
+
+        // OPTION 3: Reimport Transcription
+        if (!empty($options['transcripts'])) {
+            try {
+                $transcript = $supadata_api->get_transcript($video_url);
+
+                if (!is_wp_error($transcript)) {
+                    update_post_meta($post_id, '_ipv_transcript', $transcript['text']);
+                    update_post_meta($post_id, '_ipv_transcript_language', $transcript['language']);
+                    update_post_meta($post_id, '_ipv_transcript_fetched_at', current_time('mysql'));
+                    $results['transcripts'] = '✅ Trascrizione aggiornata';
+                } else {
+                    $errors[] = 'Trascrizione: ' . $transcript->get_error_message();
+                }
+            } catch (Exception $e) {
+                $errors[] = 'Trascrizione: ' . $e->getMessage();
+            }
+        }
+
+        // OPTION 4: Reimport AI Description
+        if (!empty($options['descriptions'])) {
+            try {
+                // Get transcript (either newly fetched or existing)
+                $transcript = get_post_meta($post_id, '_ipv_transcript', true);
+
+                if (!empty($transcript)) {
+                    $ai_description = $openai_api->generate_description($transcript);
+
+                    if (!is_wp_error($ai_description)) {
+                        // Update post content
+                        wp_update_post([
+                            'ID' => $post_id,
+                            'post_content' => $ai_description
+                        ]);
+
+                        update_post_meta($post_id, '_ipv_ai_description_generated_at', current_time('mysql'));
+                        $results['descriptions'] = '✅ Descrizione AI aggiornata';
+                    } else {
+                        $errors[] = 'Descrizione AI: ' . $ai_description->get_error_message();
+                    }
+                } else {
+                    $errors[] = 'Descrizione AI: nessuna trascrizione disponibile';
+                }
+            } catch (Exception $e) {
+                $errors[] = 'Descrizione AI: ' . $e->getMessage();
+            }
+        }
+
+        // Build response
+        $success_count = count($results);
+        $error_count = count($errors);
+
+        $message = sprintf(
+            'Post #%d (%s): %d operazioni OK, %d errori',
+            $post_id,
+            $post->post_title,
+            $success_count,
+            $error_count
+        );
+
+        if ($error_count > 0) {
+            $message .= "\nErrori: " . implode('; ', $errors);
+        }
+
+        wp_send_json_success([
+            'post_id' => $post_id,
+            'post_title' => $post->post_title,
+            'results' => $results,
+            'errors' => $errors,
+            'success_count' => $success_count,
+            'error_count' => $error_count,
+            'message' => $message
+        ]);
+    }
+
+    /**
      * =====================================================
      * HELPER FUNCTIONS
      * =====================================================
@@ -1775,6 +2037,151 @@ CSS;
                         alert('❌ ERRORE!\n\n' + res.data.message);
                     }
                 });
+            });
+
+            // =====================================================
+            // BULK REIMPORT SYSTEM
+            // =====================================================
+            var bulkReimportQueue = [];
+            var bulkReimportIndex = 0;
+            var bulkReimportStopped = false;
+            var bulkReimportStats = {
+                total: 0,
+                processed: 0,
+                success: 0,
+                errors: 0
+            };
+
+            $('#ipv-bulk-reimport-all').on('click', function() {
+                // Get selected options
+                var options = {
+                    transcripts: $('#bulk-reimport-transcripts').is(':checked'),
+                    thumbnails: $('#bulk-reimport-thumbnails').is(':checked'),
+                    descriptions: $('#bulk-reimport-descriptions').is(':checked'),
+                    metadata: $('#bulk-reimport-metadata').is(':checked')
+                };
+
+                // Check at least one option is selected
+                if (!options.transcripts && !options.thumbnails && !options.descriptions && !options.metadata) {
+                    alert('⚠️ Seleziona almeno un\'opzione da reimportare!');
+                    return;
+                }
+
+                // Confirm
+                var confirmMsg = '🔄 BULK REIMPORT\n\nStai per reimportare i seguenti dati per TUTTI i video nella queue:\n\n';
+                if (options.transcripts) confirmMsg += '✅ Trascrizioni (SupaData API)\n';
+                if (options.thumbnails) confirmMsg += '✅ Thumbnails (YouTube)\n';
+                if (options.descriptions) confirmMsg += '✅ Descrizioni AI (OpenAI)\n';
+                if (options.metadata) confirmMsg += '✅ Metadata (YouTube API)\n';
+                confirmMsg += '\n⏱️ Questa operazione può richiedere diversi minuti.\n\nVuoi continuare?';
+
+                if (!confirm(confirmMsg)) return;
+
+                // Reset state
+                bulkReimportStopped = false;
+                bulkReimportStats = {total: 0, processed: 0, success: 0, errors: 0};
+
+                // Show progress bar
+                $('#bulk-reimport-progress').show();
+                $('#bulk-reimport-status').removeClass('success error').addClass('info show').text('Inizializzazione...');
+                $('#ipv-bulk-reimport-all').hide();
+                $('#ipv-stop-bulk-reimport').show();
+
+                // Get queue
+                $.post(ajaxurl, {action: 'ipv_get_bulk_reimport_queue'}, function(res) {
+                    if (!res.success) {
+                        showStatus('#bulk-reimport-status', res.data.message, 'error');
+                        $('#bulk-reimport-progress').hide();
+                        $('#ipv-bulk-reimport-all').show();
+                        $('#ipv-stop-bulk-reimport').hide();
+                        return;
+                    }
+
+                    bulkReimportQueue = res.data.video_ids;
+                    bulkReimportStats.total = res.data.total;
+                    bulkReimportIndex = 0;
+
+                    showStatus('#bulk-reimport-status', 'Elaborazione di ' + bulkReimportStats.total + ' video...', 'info');
+
+                    // Start processing
+                    processBulkReimportNext(options);
+                });
+            });
+
+            function processBulkReimportNext(options) {
+                // Check if stopped
+                if (bulkReimportStopped) {
+                    showStatus('#bulk-reimport-status', '⏸️ REIMPORT INTERROTTO dall\'utente. Processati ' + bulkReimportStats.processed + ' di ' + bulkReimportStats.total + ' video.', 'error');
+                    $('#ipv-bulk-reimport-all').show();
+                    $('#ipv-stop-bulk-reimport').hide();
+                    return;
+                }
+
+                // Check if finished
+                if (bulkReimportIndex >= bulkReimportQueue.length) {
+                    // All done!
+                    var percentage = 100;
+                    $('#bulk-reimport-progress-bar').css('width', percentage + '%').text(percentage + '%');
+                    $('#bulk-reimport-progress-text').text('✅ Completato!');
+
+                    var finalMsg = '✅ BULK REIMPORT COMPLETATO!\n\n' +
+                        'Totale video: ' + bulkReimportStats.total + '\n' +
+                        'Successi: ' + bulkReimportStats.success + '\n' +
+                        'Errori: ' + bulkReimportStats.errors;
+
+                    showStatus('#bulk-reimport-status', finalMsg, 'success');
+                    alert(finalMsg + '\n\nLa pagina si ricaricherà tra 3 secondi...');
+
+                    setTimeout(function() {
+                        location.reload();
+                    }, 3000);
+
+                    $('#ipv-bulk-reimport-all').show();
+                    $('#ipv-stop-bulk-reimport').hide();
+                    return;
+                }
+
+                // Get current post ID
+                var postId = bulkReimportQueue[bulkReimportIndex];
+
+                // Update progress
+                var percentage = Math.round((bulkReimportIndex / bulkReimportStats.total) * 100);
+                $('#bulk-reimport-progress-bar').css('width', percentage + '%').text(percentage + '%');
+                $('#bulk-reimport-progress-text').text(
+                    'Elaborazione video ' + (bulkReimportIndex + 1) + ' di ' + bulkReimportStats.total + '...'
+                );
+
+                // Process video
+                $.post(ajaxurl, {
+                    action: 'ipv_bulk_reimport_video',
+                    post_id: postId,
+                    options: options
+                }, function(res) {
+                    bulkReimportStats.processed++;
+
+                    if (res.success) {
+                        bulkReimportStats.success++;
+                    } else {
+                        bulkReimportStats.errors++;
+                    }
+
+                    // Move to next
+                    bulkReimportIndex++;
+                    processBulkReimportNext(options);
+                }).fail(function() {
+                    // On AJAX error, count as error and continue
+                    bulkReimportStats.processed++;
+                    bulkReimportStats.errors++;
+                    bulkReimportIndex++;
+                    processBulkReimportNext(options);
+                });
+            }
+
+            $('#ipv-stop-bulk-reimport').on('click', function() {
+                if (confirm('⚠️ Vuoi davvero interrompere il BULK REIMPORT?\n\nI video già processati manterranno i nuovi dati.')) {
+                    bulkReimportStopped = true;
+                    $(this).prop('disabled', true).text('⏸️ Arresto in corso...');
+                }
             });
         });
         </script>
