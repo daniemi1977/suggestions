@@ -272,6 +272,18 @@ class CWAU_CRM {
     }
 
     /**
+     * Get deal by ID
+     */
+    public static function get_deal($deal_id) {
+        global $wpdb;
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}cwau_deals WHERE id = %d",
+            $deal_id
+        ));
+    }
+
+    /**
      * Update deal stage
      */
     public static function update_deal_stage($deal_id, $new_stage, $metadata = array()) {

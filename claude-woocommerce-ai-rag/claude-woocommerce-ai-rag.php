@@ -43,6 +43,9 @@ require_once CWAU_PATH . 'includes/class-crm.php';
 require_once CWAU_PATH . 'includes/class-tickets.php';
 require_once CWAU_PATH . 'includes/class-live-chat.php';
 require_once CWAU_PATH . 'includes/class-operator-dashboard.php';
+require_once CWAU_PATH . 'includes/class-automation.php';
+require_once CWAU_PATH . 'includes/class-integrations.php';
+require_once CWAU_PATH . 'includes/class-reporting.php';
 
 class CWAU_Plugin {
     private static $instance = null;
@@ -108,6 +111,22 @@ class CWAU_Plugin {
         add_action('wp_ajax_cwau_operator_get_queue', array('CWAU_Live_Chat', 'ajax_get_queue'));
         add_action('wp_ajax_cwau_operator_update_status', array('CWAU_Live_Chat', 'ajax_update_status'));
         add_action('wp_ajax_cwau_operator_typing', array('CWAU_Live_Chat', 'ajax_typing'));
+
+        // Automation & Workflows
+        add_action('wp_ajax_cwau_get_workflows', array('CWAU_Automation', 'ajax_get_workflows'));
+        add_action('wp_ajax_cwau_create_workflow', array('CWAU_Automation', 'ajax_create_workflow'));
+        add_action('wp_ajax_cwau_update_workflow', array('CWAU_Automation', 'ajax_update_workflow'));
+        add_action('wp_ajax_cwau_delete_workflow', array('CWAU_Automation', 'ajax_delete_workflow'));
+
+        // Integrations
+        add_action('wp_ajax_cwau_test_integration', array('CWAU_Integrations', 'ajax_test_integration'));
+        add_action('wp_ajax_cwau_sync_customer', array('CWAU_Integrations', 'ajax_sync_customer'));
+        add_action('wp_ajax_cwau_sync_ticket', array('CWAU_Integrations', 'ajax_sync_ticket'));
+        add_action('wp_ajax_nopriv_cwau_webhook', array('CWAU_Integrations', 'handle_webhook'));
+
+        // Reporting
+        add_action('wp_ajax_cwau_get_report', array('CWAU_Reporting', 'ajax_get_report'));
+        add_action('wp_ajax_cwau_export_report', array('CWAU_Reporting', 'ajax_export_report'));
 
         // Frontend
         add_shortcode('cwau_chat', array('CWAU_Chat', 'shortcode'));
