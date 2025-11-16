@@ -42,6 +42,7 @@ require_once CWAU_PATH . 'includes/class-testers.php';
 require_once CWAU_PATH . 'includes/class-crm.php';
 require_once CWAU_PATH . 'includes/class-tickets.php';
 require_once CWAU_PATH . 'includes/class-live-chat.php';
+require_once CWAU_PATH . 'includes/class-operator-dashboard.php';
 
 class CWAU_Plugin {
     private static $instance = null;
