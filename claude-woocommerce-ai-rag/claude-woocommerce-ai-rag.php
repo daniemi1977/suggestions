@@ -39,6 +39,9 @@ require_once CWAU_PATH . 'includes/class-analytics.php';
 require_once CWAU_PATH . 'includes/class-operators.php';
 require_once CWAU_PATH . 'includes/class-ecommerce.php';
 require_once CWAU_PATH . 'includes/class-testers.php';
+require_once CWAU_PATH . 'includes/class-crm.php';
+require_once CWAU_PATH . 'includes/class-tickets.php';
+require_once CWAU_PATH . 'includes/class-live-chat.php';
 
 class CWAU_Plugin {
     private static $instance = null;
@@ -90,6 +93,20 @@ class CWAU_Plugin {
         add_action('wp_ajax_nopriv_cwau_get_order_status', array('CWAU_Ecommerce', 'ajax_get_order_status'));
         add_action('wp_ajax_cwau_notify_stock', array('CWAU_Ecommerce', 'ajax_notify_stock'));
         add_action('wp_ajax_nopriv_cwau_notify_stock', array('CWAU_Ecommerce', 'ajax_notify_stock'));
+
+        // Ticketing
+        add_action('wp_ajax_cwau_create_ticket', array('CWAU_Tickets', 'ajax_create_from_escalation'));
+        add_action('wp_ajax_nopriv_cwau_create_ticket', array('CWAU_Tickets', 'ajax_create_from_escalation'));
+        add_action('wp_ajax_cwau_get_tickets', array('CWAU_Tickets', 'ajax_get_tickets'));
+
+        // Live Chat Operatore
+        add_action('wp_ajax_cwau_operator_join', array('CWAU_Live_Chat', 'ajax_operator_join'));
+        add_action('wp_ajax_cwau_operator_leave', array('CWAU_Live_Chat', 'ajax_operator_leave'));
+        add_action('wp_ajax_cwau_operator_transfer', array('CWAU_Live_Chat', 'ajax_transfer'));
+        add_action('wp_ajax_cwau_operator_send_message', array('CWAU_Live_Chat', 'ajax_send_message'));
+        add_action('wp_ajax_cwau_operator_get_queue', array('CWAU_Live_Chat', 'ajax_get_queue'));
+        add_action('wp_ajax_cwau_operator_update_status', array('CWAU_Live_Chat', 'ajax_update_status'));
+        add_action('wp_ajax_cwau_operator_typing', array('CWAU_Live_Chat', 'ajax_typing'));
 
         // Frontend
         add_shortcode('cwau_chat', array('CWAU_Chat', 'shortcode'));
@@ -160,10 +177,18 @@ register_uninstall_hook(__FILE__, 'cwau_uninstall');
 function cwau_uninstall() {
     global $wpdb;
 
-    // Drop tables
-    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_conversations");
+    // Drop tables (order matters due to foreign keys)
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_ticket_replies");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_tickets");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_activities");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_deals");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_operator_sessions");
     $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_messages");
     $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_escalations");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_conversations");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_customers");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_workflows");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_notifications");
     $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cwau_embeddings");
 
     // Delete all options
