@@ -32,10 +32,7 @@ class IPV_Prod_CPT {
         add_action( 'init', [ __CLASS__, 'register_taxonomies' ] );
         add_action( 'add_meta_boxes', [ __CLASS__, 'add_meta_boxes' ] );
         add_action( 'save_post_' . self::POST_TYPE, [ __CLASS__, 'save_meta_boxes' ], 10, 2 );
-        add_filter( 'manage_' . self::POST_TYPE . '_posts_columns', [ __CLASS__, 'admin_columns' ] );
-        add_action( 'manage_' . self::POST_TYPE . '_posts_custom_column', [ __CLASS__, 'admin_column_content' ], 10, 2 );
-        add_filter( 'manage_edit-' . self::POST_TYPE . '_sortable_columns', [ __CLASS__, 'sortable_columns' ] );
-        add_action( 'pre_get_posts', [ __CLASS__, 'sort_by_custom_column' ] );
+        // Le colonne admin sono gestite da class-video-list-columns.php
     }
 
     /**

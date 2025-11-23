@@ -30,6 +30,7 @@ require_once IPV_PROD_PLUGIN_DIR . 'includes/class-youtube-importer.php';
 require_once IPV_PROD_PLUGIN_DIR . 'includes/class-rss-importer.php';
 require_once IPV_PROD_PLUGIN_DIR . 'includes/class-youtube-api.php';
 require_once IPV_PROD_PLUGIN_DIR . 'includes/class-bulk-import.php';
+require_once IPV_PROD_PLUGIN_DIR . 'includes/class-video-list-columns.php';
 
 class IPV_Production_System_Pro {
 
