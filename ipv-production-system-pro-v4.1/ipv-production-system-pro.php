@@ -44,8 +44,7 @@ class IPV_Production_System_Pro {
     }
 
     private function __construct() {
-        // CPT
-        add_action( 'init', [ 'IPV_Prod_CPT', 'register' ] );
+        // CPT e Video List Columns sono inizializzati automaticamente dai loro file
 
         // Settings
         add_action( 'admin_init', [ 'IPV_Prod_Settings', 'register_settings' ] );
