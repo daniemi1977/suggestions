@@ -97,6 +97,129 @@ class IPV_Prod_AI_Generator {
         return trim( $data['choices'][0]['message']['content'] );
     }
 
+    /**
+     * Determina la categoria del video basandosi sulla descrizione
+     *
+     * @param string $description Descrizione generata dall'AI
+     * @param string $title Titolo del video
+     * @return string|null Nome della categoria o null
+     */
+    public static function determine_category( $description, $title = '' ) {
+        $api_key = get_option( 'ipv_openai_api_key', '' );
+        if ( empty( $api_key ) ) {
+            return null;
+        }
+
+        // Categorie disponibili per "Il Punto di Vista"
+        $categories = [
+            'Esoterismo',
+            'Spiritualità',
+            'Misteri',
+            'Geopolitica',
+            'Divulgazione alternativa',
+            'Attualità',
+            'Scienza',
+            'Storia',
+            'Interviste',
+            'Live e Dirette',
+        ];
+
+        $categories_list = implode( ', ', $categories );
+
+        $prompt = "Analizza il seguente contenuto e determina la categoria più appropriata tra queste: {$categories_list}.
+
+Rispondi SOLO con il nome esatto della categoria, senza spiegazioni o altro testo.
+
+Titolo: {$title}
+
+Descrizione:
+" . mb_substr( $description, 0, 2000 );
+
+        $body = [
+            'model'    => 'gpt-4o-mini',
+            'messages' => [
+                [
+                    'role'    => 'system',
+                    'content' => 'Sei un assistente che categorizza contenuti. Rispondi solo con il nome della categoria, nient\'altro.',
+                ],
+                [
+                    'role'    => 'user',
+                    'content' => $prompt,
+                ],
+            ],
+            'temperature' => 0.3,
+            'max_tokens'  => 50,
+        ];
+
+        $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', [
+            'headers' => [
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . $api_key,
+            ],
+            'body'    => wp_json_encode( $body ),
+            'timeout' => 30,
+        ] );
+
+        if ( is_wp_error( $response ) ) {
+            return null;
+        }
+
+        $data = json_decode( wp_remote_retrieve_body( $response ), true );
+
+        if ( empty( $data['choices'][0]['message']['content'] ) ) {
+            return null;
+        }
+
+        $suggested = trim( $data['choices'][0]['message']['content'] );
+
+        // Verifica che la categoria suggerita sia valida
+        foreach ( $categories as $cat ) {
+            if ( stripos( $suggested, $cat ) !== false ) {
+                return $cat;
+            }
+        }
+
+        // Fallback: restituisce la prima parola se corrisponde
+        $first_word = explode( ' ', $suggested )[0];
+        foreach ( $categories as $cat ) {
+            if ( stripos( $cat, $first_word ) !== false ) {
+                return $cat;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Assegna la categoria al post
+     *
+     * @param int    $post_id Post ID
+     * @param string $category_name Nome della categoria
+     * @return bool True se assegnata con successo
+     */
+    public static function assign_category( $post_id, $category_name ) {
+        if ( empty( $category_name ) ) {
+            return false;
+        }
+
+        // Cerca o crea la categoria
+        $term = term_exists( $category_name, 'video_category' );
+
+        if ( ! $term ) {
+            $term = wp_insert_term( $category_name, 'video_category' );
+        }
+
+        if ( is_wp_error( $term ) ) {
+            return false;
+        }
+
+        $term_id = is_array( $term ) ? $term['term_id'] : $term;
+
+        wp_set_object_terms( $post_id, [ (int) $term_id ], 'video_category' );
+
+        return true;
+    }
+
     protected static function get_default_prompt() {
         return <<<'PROMPT'
 # GOLDEN PROMPT - Generazione Descrizioni Video "Il Punto di Vista"

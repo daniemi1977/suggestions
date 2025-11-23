@@ -211,6 +211,17 @@ class IPV_Prod_Queue {
 
         update_post_meta( $post_id, '_ipv_ai_description', $desc );
 
+        // Auto-categorizzazione basata sulla descrizione
+        $category = IPV_Prod_AI_Generator::determine_category( $desc, get_the_title( $post_id ) );
+        if ( $category ) {
+            IPV_Prod_AI_Generator::assign_category( $post_id, $category );
+            update_post_meta( $post_id, '_ipv_auto_category', $category );
+            IPV_Prod_Logger::log( 'Categoria assegnata automaticamente', [
+                'post_id'  => $post_id,
+                'category' => $category,
+            ] );
+        }
+
         IPV_Prod_Logger::log( 'Job completato con successo', [
             'post_id'  => $post_id,
             'video_id' => $video_id,
