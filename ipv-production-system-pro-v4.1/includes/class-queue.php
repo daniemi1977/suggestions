@@ -184,11 +184,6 @@ class IPV_Prod_Queue {
 
                 // Scarica e imposta la thumbnail come featured image
                 self::set_featured_image_from_youtube( $post_id, $video_data['thumbnail_url'] );
-
-                // Importa i tag YouTube come tag del post
-                if ( ! empty( $video_data['tags'] ) ) {
-                    wp_set_object_terms( $post_id, $video_data['tags'], 'video_tag', true );
-                }
             }
         }
 

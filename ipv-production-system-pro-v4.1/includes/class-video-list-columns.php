@@ -61,16 +61,11 @@ class IPV_Prod_Video_List_Columns {
         $new_columns['ipv_video_id']  = 'Video ID';
         $new_columns['ipv_duration']  = '<span class="dashicons dashicons-clock" title="Durata"></span>';
         $new_columns['ipv_views']     = '<span class="dashicons dashicons-visibility" title="Visualizzazioni"></span>';
-        $new_columns['ipv_likes']     = '<span class="dashicons dashicons-thumbs-up" title="Like"></span>';
         $new_columns['ipv_status']    = 'Stato';
-        $new_columns['ipv_source']    = 'Fonte';
 
-        // Categorie e tag
+        // Categorie video
         if ( isset( $columns['taxonomy-video_category'] ) ) {
             $new_columns['taxonomy-video_category'] = $columns['taxonomy-video_category'];
-        }
-        if ( isset( $columns['taxonomy-video_tag'] ) ) {
-            $new_columns['taxonomy-video_tag'] = $columns['taxonomy-video_tag'];
         }
 
         // Data
@@ -105,16 +100,8 @@ class IPV_Prod_Video_List_Columns {
                 self::render_views_column( $post_id );
                 break;
 
-            case 'ipv_likes':
-                self::render_likes_column( $post_id );
-                break;
-
             case 'ipv_status':
                 self::render_status_column( $post_id );
-                break;
-
-            case 'ipv_source':
-                self::render_source_column( $post_id );
                 break;
         }
     }
@@ -188,23 +175,6 @@ class IPV_Prod_Video_List_Columns {
     }
 
     /**
-     * Renderizza la colonna like
-     */
-    protected static function render_likes_column( $post_id ) {
-        $likes = get_post_meta( $post_id, '_ipv_yt_like_count', true );
-        if ( $likes ) {
-            $formatted = self::format_number( $likes );
-            printf(
-                '<span style="font-weight:600;color:#46b450;" title="%s like">%s</span>',
-                number_format_i18n( $likes ),
-                esc_html( $formatted )
-            );
-        } else {
-            echo '<span style="color:#999;">—</span>';
-        }
-    }
-
-    /**
      * Renderizza la colonna stato
      */
     protected static function render_status_column( $post_id ) {
@@ -237,30 +207,6 @@ class IPV_Prod_Video_List_Columns {
     }
 
     /**
-     * Renderizza la colonna fonte
-     */
-    protected static function render_source_column( $post_id ) {
-        $source = get_post_meta( $post_id, '_ipv_source', true );
-
-        $sources = [
-            'manual'  => [ 'label' => 'Manuale', 'color' => '#6c757d' ],
-            'rss'     => [ 'label' => 'RSS', 'color' => '#fd7e14' ],
-            'bulk'    => [ 'label' => 'Bulk', 'color' => '#6f42c1' ],
-            'playlist'=> [ 'label' => 'Playlist', 'color' => '#20c997' ],
-        ];
-
-        if ( isset( $sources[ $source ] ) ) {
-            printf(
-                '<span style="background:%s;color:#fff;padding:2px 6px;border-radius:3px;font-size:11px;">%s</span>',
-                esc_attr( $sources[ $source ]['color'] ),
-                esc_html( $sources[ $source ]['label'] )
-            );
-        } else {
-            echo '<span style="color:#999;">—</span>';
-        }
-    }
-
-    /**
      * Definisce le colonne ordinabili
      *
      * @param array $columns Colonne ordinabili
@@ -268,7 +214,6 @@ class IPV_Prod_Video_List_Columns {
      */
     public static function sortable_columns( $columns ) {
         $columns['ipv_views']    = 'ipv_views';
-        $columns['ipv_likes']    = 'ipv_likes';
         $columns['ipv_duration'] = 'ipv_duration';
         return $columns;
     }
@@ -295,11 +240,6 @@ class IPV_Prod_Video_List_Columns {
                 $query->set( 'orderby', 'meta_value_num' );
                 break;
 
-            case 'ipv_likes':
-                $query->set( 'meta_key', '_ipv_yt_like_count' );
-                $query->set( 'orderby', 'meta_value_num' );
-                break;
-
             case 'ipv_duration':
                 $query->set( 'meta_key', '_ipv_yt_duration_seconds' );
                 $query->set( 'orderby', 'meta_value_num' );
@@ -321,9 +261,7 @@ class IPV_Prod_Video_List_Columns {
             .column-ipv_video_id { width: 120px; }
             .column-ipv_duration { width: 70px; text-align: center; }
             .column-ipv_views { width: 70px; text-align: center; }
-            .column-ipv_likes { width: 70px; text-align: center; }
             .column-ipv_status { width: 100px; }
-            .column-ipv_source { width: 80px; }
 
             .ipv-badge {
                 display: inline-block;
@@ -341,8 +279,7 @@ class IPV_Prod_Video_List_Columns {
             /* Header icone */
             .column-ipv_thumbnail .dashicons,
             .column-ipv_duration .dashicons,
-            .column-ipv_views .dashicons,
-            .column-ipv_likes .dashicons {
+            .column-ipv_views .dashicons {
                 color: #666;
             }
         </style>
