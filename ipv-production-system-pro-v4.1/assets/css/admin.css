@@ -1,0 +1,634 @@
+/**
+ * IPV Production System Pro v4.0.0
+ * Admin Styles - Modern UI Design
+ */
+
+:root {
+    --ipv-primary: #667eea;
+    --ipv-primary-dark: #5568d3;
+    --ipv-secondary: #764ba2;
+    --ipv-success: #48bb78;
+    --ipv-warning: #ecc94b;
+    --ipv-danger: #f56565;
+    --ipv-info: #4299e1;
+    --ipv-light: #f7fafc;
+    --ipv-dark: #2d3748;
+    --ipv-gray-100: #f7fafc;
+    --ipv-gray-200: #edf2f7;
+    --ipv-gray-300: #e2e8f0;
+    --ipv-gray-600: #718096;
+    --ipv-gray-800: #2d3748;
+    --ipv-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --ipv-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --ipv-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --ipv-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* =======================
+   Global Styles
+   ======================= */
+
+.ipv-prod-wrap {
+    margin: 20px 20px 20px 0;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ipv-prod-header {
+    background: linear-gradient(135deg, var(--ipv-primary) 0%, var(--ipv-secondary) 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: var(--ipv-shadow-lg);
+}
+
+.ipv-prod-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: white;
+}
+
+.ipv-prod-header .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.ipv-prod-header .badge {
+    font-size: 13px;
+    padding: 6px 12px;
+    font-weight: 600;
+}
+
+/* =======================
+   Navigation Tabs
+   ======================= */
+
+.nav-tabs {
+    border-bottom: 2px solid var(--ipv-gray-200);
+    margin-bottom: 30px;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: var(--ipv-gray-600);
+    font-weight: 500;
+    padding: 12px 24px;
+    margin-right: 8px;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    background: var(--ipv-gray-100);
+    color: var(--ipv-primary);
+}
+
+.nav-tabs .nav-link.active {
+    background: var(--ipv-primary);
+    color: white;
+    box-shadow: var(--ipv-shadow-md);
+}
+
+.nav-tabs .nav-link i {
+    font-size: 16px;
+}
+
+/* =======================
+   Stat Cards
+   ======================= */
+
+.ipv-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--ipv-shadow-md);
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ipv-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--ipv-shadow-xl);
+}
+
+.ipv-stat-card.card-pending {
+    border-left-color: var(--ipv-warning);
+}
+
+.ipv-stat-card.card-processing {
+    border-left-color: var(--ipv-info);
+}
+
+.ipv-stat-card.card-done {
+    border-left-color: var(--ipv-success);
+}
+
+.ipv-stat-card.card-error {
+    border-left-color: var(--ipv-danger);
+}
+
+.ipv-stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.card-pending .ipv-stat-icon {
+    background: rgba(236, 201, 75, 0.1);
+    color: var(--ipv-warning);
+}
+
+.card-processing .ipv-stat-icon {
+    background: rgba(66, 153, 225, 0.1);
+    color: var(--ipv-info);
+}
+
+.card-done .ipv-stat-icon {
+    background: rgba(72, 187, 120, 0.1);
+    color: var(--ipv-success);
+}
+
+.card-error .ipv-stat-icon {
+    background: rgba(245, 101, 101, 0.1);
+    color: var(--ipv-danger);
+}
+
+.ipv-stat-content {
+    flex: 1;
+}
+
+.ipv-stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ipv-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.ipv-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--ipv-dark);
+    line-height: 1;
+}
+
+/* =======================
+   Cards
+   ======================= */
+
+.card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-header {
+    border-bottom: 1px solid var(--ipv-gray-200);
+    padding: 20px;
+    background: var(--ipv-gray-100);
+}
+
+.card-header h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ipv-dark);
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* =======================
+   Health Checks
+   ======================= */
+
+.ipv-health-check {
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--ipv-gray-100);
+    transition: all 0.2s ease;
+}
+
+.ipv-health-check:hover {
+    background: var(--ipv-gray-200);
+}
+
+.ipv-health-check .fw-medium {
+    font-size: 14px;
+    color: var(--ipv-dark);
+}
+
+.ipv-health-check small {
+    font-size: 12px;
+}
+
+/* =======================
+   Buttons
+   ======================= */
+
+.btn {
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--ipv-primary) 0%, var(--ipv-secondary) 100%);
+    box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    border: 2px solid var(--ipv-gray-300);
+    color: var(--ipv-gray-600);
+    background: white;
+}
+
+.btn-outline-secondary:hover {
+    border-color: var(--ipv-primary);
+    color: var(--ipv-primary);
+    background: var(--ipv-light);
+}
+
+.btn i {
+    font-size: 16px;
+}
+
+/* =======================
+   Forms
+   ======================= */
+
+.form-control, .form-select {
+    border: 2px solid var(--ipv-gray-300);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--ipv-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--ipv-dark);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-text {
+    font-size: 13px;
+    color: var(--ipv-gray-600);
+    margin-top: 6px;
+}
+
+/* =======================
+   Tables
+   ======================= */
+
+.table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--ipv-shadow-md);
+}
+
+.table thead {
+    background: var(--ipv-gray-100);
+}
+
+.table thead th {
+    font-weight: 600;
+    color: var(--ipv-dark);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 16px;
+    border: none;
+}
+
+.table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--ipv-gray-200);
+}
+
+.table tbody tr:hover {
+    background: var(--ipv-gray-100);
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =======================
+   Badges
+   ======================= */
+
+.badge {
+    padding: 6px 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+}
+
+.badge.bg-warning {
+    background: var(--ipv-warning) !important;
+    color: var(--ipv-dark);
+}
+
+.badge.bg-info {
+    background: var(--ipv-info) !important;
+}
+
+.badge.bg-success {
+    background: var(--ipv-success) !important;
+}
+
+.badge.bg-danger {
+    background: var(--ipv-danger) !important;
+}
+
+/* =======================
+   Loading States
+   ======================= */
+
+.ipv-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.ipv-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    z-index: 10;
+}
+
+.ipv-spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--ipv-gray-300);
+    border-top-color: var(--ipv-primary);
+    border-radius: 50%;
+    animation: ipv-spin 0.8s linear infinite;
+}
+
+@keyframes ipv-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =======================
+   Toast Notifications
+   ======================= */
+
+.toast {
+    border: none;
+    box-shadow: var(--ipv-shadow-lg);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.toast-header {
+    background: var(--ipv-gray-100);
+    border-bottom: 1px solid var(--ipv-gray-200);
+    padding: 12px 16px;
+}
+
+.toast-body {
+    padding: 16px;
+    font-size: 14px;
+}
+
+/* =======================
+   Alert Messages
+   ======================= */
+
+.alert {
+    border: none;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background: rgba(72, 187, 120, 0.1);
+    color: #2f855a;
+    border-left-color: var(--ipv-success);
+}
+
+.alert-danger {
+    background: rgba(245, 101, 101, 0.1);
+    color: #c53030;
+    border-left-color: var(--ipv-danger);
+}
+
+.alert-warning {
+    background: rgba(236, 201, 75, 0.1);
+    color: #975a16;
+    border-left-color: var(--ipv-warning);
+}
+
+.alert-info {
+    background: rgba(66, 153, 225, 0.1);
+    color: #2c5282;
+    border-left-color: var(--ipv-info);
+}
+
+/* =======================
+   Progress Bars
+   ======================= */
+
+.progress {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--ipv-gray-200);
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--ipv-primary) 0%, var(--ipv-secondary) 100%);
+    border-radius: 4px;
+}
+
+/* =======================
+   Empty States
+   ======================= */
+
+.ipv-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.ipv-empty-state i {
+    font-size: 64px;
+    color: var(--ipv-gray-300);
+    margin-bottom: 20px;
+}
+
+.ipv-empty-state h3 {
+    font-size: 20px;
+    color: var(--ipv-dark);
+    margin-bottom: 12px;
+}
+
+.ipv-empty-state p {
+    color: var(--ipv-gray-600);
+    font-size: 14px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* =======================
+   Responsive Design
+   ======================= */
+
+@media (max-width: 768px) {
+    .ipv-prod-wrap {
+        margin: 10px;
+    }
+
+    .ipv-prod-header {
+        padding: 20px;
+    }
+
+    .ipv-prod-header h1 {
+        font-size: 24px;
+    }
+
+    .ipv-stat-card {
+        padding: 16px;
+    }
+
+    .ipv-stat-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+
+    .ipv-stat-value {
+        font-size: 24px;
+    }
+
+    .card-body {
+        padding: 16px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
+
+/* =======================
+   WordPress Admin Overrides
+   ======================= */
+
+.ipv-prod-wrap .button-primary {
+    background: linear-gradient(135deg, var(--ipv-primary) 0%, var(--ipv-secondary) 100%);
+    border: none;
+    box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.4);
+    text-shadow: none;
+}
+
+.ipv-prod-wrap .button-primary:hover {
+    background: linear-gradient(135deg, var(--ipv-primary-dark) 0%, var(--ipv-secondary) 100%);
+    box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.6);
+}
+
+/* =======================
+   Animations
+   ======================= */
+
+.ipv-fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.ipv-slide-up {
+    animation: slideUp 0.3s ease;
+}
+
+.ipv-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* =======================
+   Utility Classes
+   ======================= */
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--ipv-primary) 0%, var(--ipv-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.shadow-sm-hover {
+    transition: box-shadow 0.2s ease;
+}
+
+.shadow-sm-hover:hover {
+    box-shadow: var(--ipv-shadow-md);
+}
