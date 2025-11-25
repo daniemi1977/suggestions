@@ -215,20 +215,17 @@ class UK_Import_VAT {
             return false;
         }
 
-        // Verifica ordine minimo (sempre senza IVA italiana)
-        if (wc_prices_include_tax()) {
-            $cart_total = floatval($cart->get_subtotal()) - floatval($cart->get_subtotal_tax()) +
-                         floatval($cart->get_shipping_total()) - floatval($cart->get_shipping_tax());
-        } else {
-            $cart_total = floatval($cart->get_subtotal()) + floatval($cart->get_shipping_total());
-        }
-
+        // Verifica ordine minimo (sempre senza IVA)
+        // Usa get_cart_contents_total() che è sempre senza tasse
+        $cart_total = floatval($cart->get_cart_contents_total()) + floatval($cart->get_shipping_total());
         $minimum = floatval($this->get_option('minimum_order', 220));
 
         if ($cart_total < $minimum) {
-            $this->debug_log('Totale ordine sotto il minimo (ex-tax): ' . $cart_total . ' < ' . $minimum);
+            $this->debug_log('Totale ordine (ex-tax): €' . number_format($cart_total, 2) . ' < minimo €' . number_format($minimum, 2));
             return false;
         }
+
+        $this->debug_log('Totale ordine (ex-tax): €' . number_format($cart_total, 2) . ' ≥ minimo €' . number_format($minimum, 2) . ' ✓');
 
         return true;
     }
@@ -243,19 +240,21 @@ class UK_Import_VAT {
 
         $cart = WC()->cart;
 
-        // Subtotal senza IVA + spedizione
         // IMPORTANTE: Usa sempre i prezzi SENZA IVA italiana
-        if (wc_prices_include_tax()) {
-            // Se i prezzi includono IVA, sottrai le tasse italiane
-            $subtotal = floatval($cart->get_subtotal()) - floatval($cart->get_subtotal_tax());
-            $shipping = floatval($cart->get_shipping_total()) - floatval($cart->get_shipping_tax());
-        } else {
-            // Se i prezzi non includono IVA, usa direttamente i totali
-            $subtotal = floatval($cart->get_subtotal());
-            $shipping = floatval($cart->get_shipping_total());
-        }
+        // get_cart_contents_total() restituisce SEMPRE il totale senza tasse
+        // indipendentemente dalla configurazione di WooCommerce
+        $subtotal = floatval($cart->get_cart_contents_total());
+        $shipping = floatval($cart->get_shipping_total());
 
         $total_eur = $subtotal + $shipping;
+
+        // Debug dettagliato
+        $this->debug_log('--- CALCOLO TASSE UK ---');
+        $this->debug_log('Subtotal (cart_contents_total): €' . number_format($subtotal, 2));
+        $this->debug_log('Shipping (shipping_total): €' . number_format($shipping, 2));
+        $this->debug_log('get_subtotal(): €' . number_format($cart->get_subtotal(), 2));
+        $this->debug_log('get_subtotal_tax(): €' . number_format($cart->get_subtotal_tax(), 2));
+        $this->debug_log('wc_prices_include_tax(): ' . (wc_prices_include_tax() ? 'SI' : 'NO'));
 
         // Tassi
         $exchange_rate = floatval($this->get_option('exchange_rate', 0.86));
@@ -286,8 +285,11 @@ class UK_Import_VAT {
             'duty_rate' => $duty_rate
         );
 
-        $tax_mode = wc_prices_include_tax() ? 'PREZZI INC. IVA (sottratta)' : 'PREZZI EX IVA';
-        $this->debug_log('Calcolo [' . $tax_mode . ']: subtotal=' . number_format($subtotal, 2) . ', shipping=' . number_format($shipping, 2) . ', total_eur=' . number_format($total_eur, 2) . ', total_gbp=' . number_format($total_gbp, 2) . ', vat_eur=' . number_format($vat_eur, 2) . ', duty_eur=' . number_format($duty_eur, 2));
+        $this->debug_log('Total EUR: €' . number_format($total_eur, 2) . ' → GBP: £' . number_format($total_gbp, 2));
+        $this->debug_log('UK VAT (' . $vat_rate . '%): €' . number_format($vat_eur, 2));
+        $this->debug_log('Duty (' . $duty_rate . '%): €' . number_format($duty_eur, 2));
+        $this->debug_log('TOTAL UK TAXES: €' . number_format($total_tax, 2));
+        $this->debug_log('--- FINE CALCOLO ---');
 
         return $result;
     }
