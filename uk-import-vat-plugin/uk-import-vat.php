@@ -215,12 +215,18 @@ class UK_Import_VAT {
             return false;
         }
 
-        // Verifica ordine minimo
-        $cart_total = floatval($cart->get_subtotal()) + floatval($cart->get_shipping_total());
+        // Verifica ordine minimo (sempre senza IVA italiana)
+        if (wc_prices_include_tax()) {
+            $cart_total = floatval($cart->get_subtotal()) - floatval($cart->get_subtotal_tax()) +
+                         floatval($cart->get_shipping_total()) - floatval($cart->get_shipping_tax());
+        } else {
+            $cart_total = floatval($cart->get_subtotal()) + floatval($cart->get_shipping_total());
+        }
+
         $minimum = floatval($this->get_option('minimum_order', 220));
 
         if ($cart_total < $minimum) {
-            $this->debug_log('Totale ordine sotto il minimo: ' . $cart_total . ' < ' . $minimum);
+            $this->debug_log('Totale ordine sotto il minimo (ex-tax): ' . $cart_total . ' < ' . $minimum);
             return false;
         }
 
@@ -238,8 +244,17 @@ class UK_Import_VAT {
         $cart = WC()->cart;
 
         // Subtotal senza IVA + spedizione
-        $subtotal = floatval($cart->get_subtotal());
-        $shipping = floatval($cart->get_shipping_total());
+        // IMPORTANTE: Usa sempre i prezzi SENZA IVA italiana
+        if (wc_prices_include_tax()) {
+            // Se i prezzi includono IVA, sottrai le tasse italiane
+            $subtotal = floatval($cart->get_subtotal()) - floatval($cart->get_subtotal_tax());
+            $shipping = floatval($cart->get_shipping_total()) - floatval($cart->get_shipping_tax());
+        } else {
+            // Se i prezzi non includono IVA, usa direttamente i totali
+            $subtotal = floatval($cart->get_subtotal());
+            $shipping = floatval($cart->get_shipping_total());
+        }
+
         $total_eur = $subtotal + $shipping;
 
         // Tassi
@@ -271,7 +286,8 @@ class UK_Import_VAT {
             'duty_rate' => $duty_rate
         );
 
-        $this->debug_log('Calcolo: subtotal=' . $subtotal . ', shipping=' . $shipping . ', total_eur=' . $total_eur . ', vat_eur=' . number_format($vat_eur, 2) . ', duty_eur=' . number_format($duty_eur, 2));
+        $tax_mode = wc_prices_include_tax() ? 'PREZZI INC. IVA (sottratta)' : 'PREZZI EX IVA';
+        $this->debug_log('Calcolo [' . $tax_mode . ']: subtotal=' . number_format($subtotal, 2) . ', shipping=' . number_format($shipping, 2) . ', total_eur=' . number_format($total_eur, 2) . ', total_gbp=' . number_format($total_gbp, 2) . ', vat_eur=' . number_format($vat_eur, 2) . ', duty_eur=' . number_format($duty_eur, 2));
 
         return $result;
     }
