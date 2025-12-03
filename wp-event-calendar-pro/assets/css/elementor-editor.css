@@ -1,0 +1,64 @@
+/**
+ * Elementor Editor Styles
+ * Styles for the Elementor widget preview in the editor
+ */
+
+.wecp-elementor-preview {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 60px 40px;
+    text-align: center;
+    color: #ffffff;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wecp-elementor-preview .wecp-preview-info {
+    max-width: 500px;
+}
+
+.wecp-elementor-preview i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+.wecp-elementor-preview h3 {
+    margin: 0 0 15px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.wecp-elementor-preview p {
+    margin: 8px 0;
+    font-size: 16px;
+    opacity: 0.95;
+    color: #ffffff;
+}
+
+.wecp-elementor-preview strong {
+    font-weight: 700;
+    color: #FFE066;
+}
+
+.wecp-elementor-preview .description {
+    margin-top: 20px;
+    font-size: 14px;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+/* Elementor Panel Custom Styles */
+.elementor-control-wecp_calendar .elementor-control-input-wrapper select,
+.elementor-control-wecp_events_list .elementor-control-input-wrapper select,
+.elementor-control-wecp_events_tile .elementor-control-input-wrapper select {
+    border-color: #667eea;
+}
+
+/* Category Icon in Elementor Panel */
+.elementor-element-categories .elementor-element-category.wecp-events {
+    background-color: #667eea;
+}

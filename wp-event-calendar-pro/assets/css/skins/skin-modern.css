@@ -1,0 +1,154 @@
+/**
+ * Modern Skin - Contemporary Design with Bold Colors
+ * Vibrant, fresh, and modern look
+ */
+
+.wecp-skin-modern {
+    --wecp-primary-color: #FF6B6B;
+    --wecp-accent-color: #4ECDC4;
+    --wecp-text-color: #2d3436;
+    --wecp-bg-color: #ffffff;
+    --wecp-border-radius: 16px;
+}
+
+.wecp-skin-modern .wecp-calendar-wrapper {
+    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+    border-radius: var(--wecp-border-radius);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    border: none;
+}
+
+.wecp-skin-modern .wecp-calendar-header {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+    color: #ffffff;
+    padding: 25px 20px;
+    border-radius: 16px 16px 0 0;
+    margin: -20px -20px 20px;
+}
+
+.wecp-skin-modern .wecp-calendar-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 28px;
+}
+
+.wecp-skin-modern .wecp-nav-prev,
+.wecp-skin-modern .wecp-nav-next {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+.wecp-skin-modern .wecp-nav-prev:hover,
+.wecp-skin-modern .wecp-nav-next:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.wecp-skin-modern .wecp-calendar-cell {
+    border: none;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin: 2px;
+}
+
+.wecp-skin-modern .wecp-calendar-cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.2);
+}
+
+.wecp-skin-modern .wecp-calendar-cell.wecp-today {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+}
+
+.wecp-skin-modern .wecp-today .wecp-cell-date {
+    color: #ffffff;
+}
+
+.wecp-skin-modern .wecp-event-card {
+    border-left: none;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    position: relative;
+}
+
+.wecp-skin-modern .wecp-event-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(180deg, #FF6B6B 0%, #4ECDC4 100%);
+}
+
+.wecp-skin-modern .wecp-event-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(255, 107, 107, 0.2);
+}
+
+.wecp-skin-modern .wecp-event-date {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.wecp-skin-modern .wecp-event-title {
+    font-weight: 700;
+    color: #2d3436;
+    font-size: 24px;
+}
+
+.wecp-skin-modern .wecp-btn {
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-weight: 600;
+    text-transform: none;
+}
+
+.wecp-skin-modern .wecp-btn-book {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.wecp-skin-modern .wecp-btn-book:hover {
+    background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+}
+
+.wecp-skin-modern .wecp-btn-details {
+    background: #f8f9fa;
+    color: #2d3436;
+    border: 2px solid #e0e0e0;
+}
+
+.wecp-skin-modern .wecp-btn-details:hover {
+    background: #4ECDC4;
+    color: #ffffff;
+    border-color: #4ECDC4;
+}
+
+.wecp-skin-modern .wecp-event-dot {
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.wecp-skin-modern .wecp-lightbox-content {
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.wecp-skin-modern .wecp-lightbox-close {
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+    color: #ffffff;
+}

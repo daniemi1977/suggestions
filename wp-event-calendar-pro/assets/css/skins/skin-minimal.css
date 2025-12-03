@@ -1,0 +1,112 @@
+/**
+ * Minimal Skin - Ultra Clean & Minimal Design
+ * Inspired by EventON's minimal aesthetic
+ */
+
+.wecp-skin-minimal {
+    --wecp-primary-color: #000000;
+    --wecp-accent-color: #111111;
+    --wecp-text-color: #333333;
+    --wecp-bg-color: #ffffff;
+    --wecp-border-radius: 0px;
+}
+
+.wecp-skin-minimal .wecp-calendar-wrapper {
+    background: var(--wecp-bg-color);
+    border-radius: 0;
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
+}
+
+.wecp-skin-minimal .wecp-calendar-header {
+    border-bottom: 2px solid #000000;
+    padding-bottom: 20px;
+}
+
+.wecp-skin-minimal .wecp-calendar-title {
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #000000;
+}
+
+.wecp-skin-minimal .wecp-calendar-cell {
+    border: 1px solid #f0f0f0;
+    border-radius: 0;
+    background: #ffffff;
+}
+
+.wecp-skin-minimal .wecp-calendar-cell:hover {
+    background: #fafafa;
+    transform: none;
+    box-shadow: none;
+}
+
+.wecp-skin-minimal .wecp-event-card {
+    border-left: none;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #ffffff;
+    padding: 30px 0;
+}
+
+.wecp-skin-minimal .wecp-event-card:hover {
+    transform: none;
+    box-shadow: none;
+    background: #fafafa;
+}
+
+.wecp-skin-minimal .wecp-event-title {
+    font-weight: 300;
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: #000000;
+}
+
+.wecp-skin-minimal .wecp-event-date {
+    background: #000000;
+    border-radius: 0;
+    color: #ffffff;
+}
+
+.wecp-skin-minimal .wecp-btn {
+    border-radius: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.wecp-skin-minimal .wecp-btn-book {
+    background: #000000;
+    color: #ffffff;
+}
+
+.wecp-skin-minimal .wecp-btn-book:hover {
+    background: #333333;
+    transform: none;
+}
+
+.wecp-skin-minimal .wecp-btn-details {
+    background: transparent;
+    color: #000000;
+    border: 1px solid #000000;
+}
+
+.wecp-skin-minimal .wecp-btn-details:hover {
+    background: #000000;
+    color: #ffffff;
+}
+
+.wecp-skin-minimal .wecp-event-dot {
+    border-radius: 0;
+    width: 6px;
+    height: 6px;
+}
+
+.wecp-skin-minimal .wecp-lightbox-content {
+    border-radius: 0;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.3);
+}

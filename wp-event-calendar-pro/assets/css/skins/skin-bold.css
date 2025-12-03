@@ -1,0 +1,202 @@
+/**
+ * Bold Skin - Vibrant and Eye-Catching
+ * Bold colors, large typography, high contrast
+ */
+
+.wecp-skin-bold {
+    --wecp-primary-color: #FF2D55;
+    --wecp-accent-color: #5856D6;
+    --wecp-text-color: #1a1a1a;
+    --wecp-bg-color: #ffffff;
+    --wecp-border-radius: 20px;
+}
+
+.wecp-skin-bold .wecp-calendar-wrapper {
+    background: #ffffff;
+    border-radius: var(--wecp-border-radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    border: 4px solid #000000;
+}
+
+.wecp-skin-bold .wecp-calendar-header {
+    background: #000000;
+    color: #ffffff;
+    padding: 30px 20px;
+    margin: -20px -20px 30px;
+    border-radius: 16px 16px 0 0;
+}
+
+.wecp-skin-bold .wecp-calendar-title {
+    color: #ffffff;
+    font-weight: 900;
+    font-size: 32px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.wecp-skin-bold .wecp-nav-prev,
+.wecp-skin-bold .wecp-nav-next {
+    background: #FF2D55;
+    border: none;
+    color: #ffffff;
+    border-radius: 12px;
+    font-weight: 900;
+    width: 50px;
+    height: 50px;
+}
+
+.wecp-skin-bold .wecp-nav-prev:hover,
+.wecp-skin-bold .wecp-nav-next:hover {
+    background: #5856D6;
+    transform: scale(1.1);
+}
+
+.wecp-skin-bold .wecp-calendar-day-name {
+    background: #000000;
+    color: #ffffff;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 15px;
+}
+
+.wecp-skin-bold .wecp-calendar-cell {
+    border: 3px solid #f0f0f0;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.wecp-skin-bold .wecp-calendar-cell:hover {
+    border-color: #FF2D55;
+    transform: scale(1.08);
+    box-shadow: 0 8px 24px rgba(255, 45, 85, 0.3);
+}
+
+.wecp-skin-bold .wecp-calendar-cell.wecp-today {
+    background: #FF2D55;
+    border-color: #FF2D55;
+}
+
+.wecp-skin-bold .wecp-today .wecp-cell-date {
+    color: #ffffff;
+    font-weight: 900;
+}
+
+.wecp-skin-bold .wecp-cell-date {
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.wecp-skin-bold .wecp-event-card {
+    border-left: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border: 4px solid #000000;
+    position: relative;
+    overflow: hidden;
+}
+
+.wecp-skin-bold .wecp-event-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #FF2D55 0%, #5856D6 50%, #FF2D55 100%);
+}
+
+.wecp-skin-bold .wecp-event-card:hover {
+    transform: translateY(-12px) rotate(-1deg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border-color: #FF2D55;
+}
+
+.wecp-skin-bold .wecp-event-date {
+    background: linear-gradient(135deg, #FF2D55 0%, #5856D6 100%);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(255, 45, 85, 0.4);
+    border: 3px solid #000000;
+}
+
+.wecp-skin-bold .wecp-date-day {
+    font-size: 36px;
+    font-weight: 900;
+}
+
+.wecp-skin-bold .wecp-date-month {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.wecp-skin-bold .wecp-event-title {
+    font-weight: 900;
+    font-size: 28px;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.wecp-skin-bold .wecp-event-time,
+.wecp-skin-bold .wecp-event-venue {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1a1a1a;
+}
+
+.wecp-skin-bold .wecp-btn {
+    border-radius: 12px;
+    padding: 16px 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 14px;
+    border: 3px solid #000000;
+}
+
+.wecp-skin-bold .wecp-btn-book {
+    background: #FF2D55;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(255, 45, 85, 0.4);
+}
+
+.wecp-skin-bold .wecp-btn-book:hover {
+    background: #5856D6;
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(88, 86, 214, 0.5);
+}
+
+.wecp-skin-bold .wecp-btn-details {
+    background: #ffffff;
+    color: #000000;
+}
+
+.wecp-skin-bold .wecp-btn-details:hover {
+    background: #000000;
+    color: #ffffff;
+}
+
+.wecp-skin-bold .wecp-event-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 0;
+    border: 2px solid #000000;
+}
+
+.wecp-skin-bold .wecp-lightbox-content {
+    border-radius: 24px;
+    border: 4px solid #000000;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+}
+
+.wecp-skin-bold .wecp-lightbox-close {
+    background: #FF2D55;
+    color: #ffffff;
+    border-radius: 12px;
+    border: 3px solid #000000;
+    font-weight: 900;
+    font-size: 32px;
+}

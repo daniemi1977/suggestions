@@ -1,0 +1,36 @@
+/**
+ * Default Skin - Clean and Modern
+ * Base skin that comes with the plugin
+ */
+
+.wecp-skin-default {
+    --wecp-primary-color: #3498db;
+    --wecp-accent-color: #667eea;
+    --wecp-text-color: #2c3e50;
+    --wecp-bg-color: #ffffff;
+    --wecp-border-radius: 8px;
+}
+
+.wecp-skin-default .wecp-calendar-wrapper {
+    background: var(--wecp-bg-color);
+    border-radius: var(--wecp-border-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wecp-skin-default .wecp-event-card {
+    border-left: 4px solid var(--wecp-primary-color);
+    transition: all 0.3s ease;
+}
+
+.wecp-skin-default .wecp-event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.3);
+}
+
+.wecp-skin-default .wecp-btn-book {
+    background: linear-gradient(135deg, var(--wecp-accent-color) 0%, #764ba2 100%);
+}
+
+.wecp-skin-default .wecp-event-date {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}

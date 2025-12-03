@@ -1,0 +1,265 @@
+/**
+ * Elegant Skin - Sophisticated & Luxurious
+ * Premium design with elegant colors and refined details
+ */
+
+.wecp-skin-elegant {
+    --wecp-primary-color: #2C3E50;
+    --wecp-accent-color: #C0A772;
+    --wecp-text-color: #34495E;
+    --wecp-bg-color: #ffffff;
+    --wecp-border-radius: 12px;
+}
+
+.wecp-skin-elegant .wecp-calendar-wrapper {
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    border-radius: var(--wecp-border-radius);
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+    border: 1px solid #e8e8e8;
+}
+
+.wecp-skin-elegant .wecp-calendar-header {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    color: #ffffff;
+    padding: 30px 25px;
+    margin: -20px -20px 30px;
+    border-radius: 12px 12px 0 0;
+    position: relative;
+}
+
+.wecp-skin-elegant .wecp-calendar-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #C0A772 25%,
+        #D4AF37 50%,
+        #C0A772 75%,
+        transparent 100%
+    );
+}
+
+.wecp-skin-elegant .wecp-calendar-title {
+    font-family: 'Georgia', 'Playfair Display', serif;
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: 1px;
+}
+
+.wecp-skin-elegant .wecp-nav-prev,
+.wecp-skin-elegant .wecp-nav-next {
+    background: rgba(192, 167, 114, 0.15);
+    border: 2px solid rgba(192, 167, 114, 0.3);
+    color: #ffffff;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    transition: all 0.4s ease;
+}
+
+.wecp-skin-elegant .wecp-nav-prev:hover,
+.wecp-skin-elegant .wecp-nav-next:hover {
+    background: #C0A772;
+    border-color: #C0A772;
+    box-shadow: 0 4px 12px rgba(192, 167, 114, 0.4);
+}
+
+.wecp-skin-elegant .wecp-calendar-day-name {
+    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    color: #2C3E50;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.wecp-skin-elegant .wecp-calendar-cell {
+    border: 1px solid #f0f0f0;
+    border-radius: 10px;
+    background: #ffffff;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wecp-skin-elegant .wecp-calendar-cell:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    border-color: #C0A772;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(192, 167, 114, 0.15);
+}
+
+.wecp-skin-elegant .wecp-calendar-cell.wecp-today {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    border-color: #C0A772;
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.25);
+}
+
+.wecp-skin-elegant .wecp-today .wecp-cell-date {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.wecp-skin-elegant .wecp-cell-date {
+    font-family: 'Georgia', serif;
+    font-weight: 500;
+}
+
+.wecp-skin-elegant .wecp-event-card {
+    border-left: none;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(44, 62, 80, 0.08);
+    border: 1px solid #f0f0f0;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wecp-skin-elegant .wecp-event-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #C0A772 0%, #D4AF37 50%, #C0A772 100%);
+}
+
+.wecp-skin-elegant .wecp-event-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.15);
+    border-color: #C0A772;
+}
+
+.wecp-skin-elegant .wecp-event-thumbnail {
+    position: relative;
+    overflow: hidden;
+}
+
+.wecp-skin-elegant .wecp-event-thumbnail::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to top, rgba(44, 62, 80, 0.7), transparent);
+}
+
+.wecp-skin-elegant .wecp-event-date {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    border-radius: 12px;
+    padding: 18px 14px;
+    box-shadow: 0 6px 20px rgba(44, 62, 80, 0.25);
+    border: 2px solid #C0A772;
+    color: #ffffff;
+}
+
+.wecp-skin-elegant .wecp-date-day {
+    font-family: 'Georgia', serif;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.wecp-skin-elegant .wecp-date-month {
+    font-family: 'Georgia', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.wecp-skin-elegant .wecp-event-title {
+    font-family: 'Georgia', 'Playfair Display', serif;
+    font-weight: 600;
+    color: #2C3E50;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+}
+
+.wecp-skin-elegant .wecp-event-excerpt {
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    color: #5a6c7d;
+}
+
+.wecp-skin-elegant .wecp-event-time .dashicons,
+.wecp-skin-elegant .wecp-event-venue .dashicons {
+    color: #C0A772;
+}
+
+.wecp-skin-elegant .wecp-btn {
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 12px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wecp-skin-elegant .wecp-btn-book {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    color: #ffffff;
+    border: 2px solid #C0A772;
+    box-shadow: 0 4px 15px rgba(44, 62, 80, 0.25);
+}
+
+.wecp-skin-elegant .wecp-btn-book:hover {
+    background: linear-gradient(135deg, #C0A772 0%, #D4AF37 100%);
+    border-color: #D4AF37;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(192, 167, 114, 0.4);
+    color: #2C3E50;
+}
+
+.wecp-skin-elegant .wecp-btn-details {
+    background: transparent;
+    color: #2C3E50;
+    border: 2px solid #e0e0e0;
+}
+
+.wecp-skin-elegant .wecp-btn-details:hover {
+    background: #f8f9fa;
+    border-color: #2C3E50;
+}
+
+.wecp-skin-elegant .wecp-event-dot {
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.wecp-skin-elegant .wecp-lightbox-overlay {
+    background: rgba(44, 62, 80, 0.85);
+    backdrop-filter: blur(10px);
+}
+
+.wecp-skin-elegant .wecp-lightbox-content {
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(44, 62, 80, 0.3);
+    border: 1px solid #e0e0e0;
+}
+
+.wecp-skin-elegant .wecp-lightbox-close {
+    background: rgba(44, 62, 80, 0.9);
+    color: #ffffff;
+    border-radius: 50%;
+    border: 2px solid #C0A772;
+    backdrop-filter: blur(10px);
+}
+
+.wecp-skin-elegant .wecp-lightbox-close:hover {
+    background: #C0A772;
+    border-color: #D4AF37;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.wecp-skin-elegant .wecp-modal-meta {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-left: 4px solid #C0A772;
+}

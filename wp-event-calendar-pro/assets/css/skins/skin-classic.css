@@ -1,0 +1,192 @@
+/**
+ * Classic Skin - Timeless Elegance
+ * Traditional design with serif fonts and classic colors
+ */
+
+.wecp-skin-classic {
+    --wecp-primary-color: #8B4513;
+    --wecp-accent-color: #DAA520;
+    --wecp-text-color: #3a3a3a;
+    --wecp-bg-color: #fefefe;
+    --wecp-border-radius: 4px;
+}
+
+.wecp-skin-classic .wecp-calendar-wrapper {
+    background: #faf8f5;
+    border-radius: var(--wecp-border-radius);
+    box-shadow: 0 4px 16px rgba(139, 69, 19, 0.15);
+    border: 2px solid #d4c5b9;
+}
+
+.wecp-skin-classic .wecp-calendar-header {
+    background: linear-gradient(180deg, #8B4513 0%, #654321 100%);
+    color: #f5f5dc;
+    padding: 25px 20px;
+    margin: -20px -20px 25px;
+    border-bottom: 4px solid #DAA520;
+}
+
+.wecp-skin-classic .wecp-calendar-title {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: #f5f5dc;
+    font-weight: 400;
+    font-size: 28px;
+    font-style: italic;
+}
+
+.wecp-skin-classic .wecp-nav-prev,
+.wecp-skin-classic .wecp-nav-next {
+    background: #DAA520;
+    border: 2px solid #B8860B;
+    color: #ffffff;
+    border-radius: 4px;
+}
+
+.wecp-skin-classic .wecp-nav-prev:hover,
+.wecp-skin-classic .wecp-nav-next:hover {
+    background: #B8860B;
+    border-color: #8B6914;
+}
+
+.wecp-skin-classic .wecp-calendar-day-name {
+    background: #e8ddd0;
+    color: #654321;
+    font-family: 'Georgia', serif;
+    font-weight: 600;
+    text-transform: capitalize;
+    border-bottom: 2px solid #d4c5b9;
+}
+
+.wecp-skin-classic .wecp-calendar-cell {
+    border: 1px solid #e8ddd0;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.wecp-skin-classic .wecp-calendar-cell:hover {
+    background: #fef9f3;
+    border-color: #DAA520;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(218, 165, 32, 0.2);
+}
+
+.wecp-skin-classic .wecp-calendar-cell.wecp-today {
+    background: #8B4513;
+    border-color: #8B4513;
+}
+
+.wecp-skin-classic .wecp-today .wecp-cell-date {
+    color: #f5f5dc;
+}
+
+.wecp-skin-classic .wecp-event-card {
+    border-left: none;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 3px 12px rgba(139, 69, 19, 0.1);
+    border: 2px solid #e8ddd0;
+    position: relative;
+}
+
+.wecp-skin-classic .wecp-event-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100%;
+    background: linear-gradient(180deg, #8B4513 0%, #DAA520 100%);
+    border-radius: 8px 0 0 8px;
+}
+
+.wecp-skin-classic .wecp-event-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.15);
+    border-color: #DAA520;
+}
+
+.wecp-skin-classic .wecp-event-date {
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+    border-radius: 8px;
+    border: 2px solid #DAA520;
+    color: #f5f5dc;
+}
+
+.wecp-skin-classic .wecp-date-day {
+    font-family: 'Georgia', serif;
+    font-weight: 700;
+}
+
+.wecp-skin-classic .wecp-date-month {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+}
+
+.wecp-skin-classic .wecp-event-title {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-weight: 600;
+    color: #3a3a3a;
+    font-size: 24px;
+}
+
+.wecp-skin-classic .wecp-event-excerpt {
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    color: #5a5a5a;
+}
+
+.wecp-skin-classic .wecp-btn {
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-family: 'Georgia', serif;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.wecp-skin-classic .wecp-btn-book {
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+    color: #f5f5dc;
+    border: 2px solid #DAA520;
+    box-shadow: 0 3px 10px rgba(139, 69, 19, 0.3);
+}
+
+.wecp-skin-classic .wecp-btn-book:hover {
+    background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(218, 165, 32, 0.4);
+}
+
+.wecp-skin-classic .wecp-btn-details {
+    background: #faf8f5;
+    color: #654321;
+    border: 2px solid #d4c5b9;
+}
+
+.wecp-skin-classic .wecp-btn-details:hover {
+    background: #e8ddd0;
+    border-color: #8B4513;
+}
+
+.wecp-skin-classic .wecp-event-dot {
+    border-radius: 50%;
+    border: 2px solid #8B4513;
+}
+
+.wecp-skin-classic .wecp-lightbox-content {
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(139, 69, 19, 0.25);
+    border: 3px solid #DAA520;
+    background: #faf8f5;
+}
+
+.wecp-skin-classic .wecp-lightbox-close {
+    background: #8B4513;
+    color: #f5f5dc;
+    border-radius: 6px;
+    border: 2px solid #DAA520;
+}
+
+.wecp-skin-classic .wecp-lightbox-close:hover {
+    background: #DAA520;
+    color: #ffffff;
+}

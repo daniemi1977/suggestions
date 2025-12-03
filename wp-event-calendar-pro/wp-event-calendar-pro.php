@@ -75,6 +75,7 @@ class WP_Event_Calendar_Pro {
         require_once WECP_PLUGIN_DIR . 'includes/class-booking-manager.php';
         require_once WECP_PLUGIN_DIR . 'includes/class-qr-code-generator.php';
         require_once WECP_PLUGIN_DIR . 'includes/class-admin-settings.php';
+        require_once WECP_PLUGIN_DIR . 'includes/class-elementor-integration.php';
     }
 
     /**
@@ -102,6 +103,9 @@ class WP_Event_Calendar_Pro {
             WECP_WooCommerce_Integration::get_instance();
             WECP_Booking_Manager::get_instance();
         }
+
+        // Initialize Elementor integration
+        WECP_Elementor_Integration::get_instance();
     }
 
     /**
