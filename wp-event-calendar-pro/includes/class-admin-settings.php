@@ -30,46 +30,14 @@ class WECP_Admin_Settings {
      * Add admin menu
      */
     public function add_admin_menu() {
-        add_menu_page(
-            __('Event Calendar Settings', 'wp-event-calendar-pro'),
-            __('Event Calendar', 'wp-event-calendar-pro'),
-            'manage_options',
-            'wecp-settings',
-            array($this, 'render_settings_page'),
-            'dashicons-calendar-alt',
-            26
-        );
-
+        // Add Settings submenu under the Events post type menu
         add_submenu_page(
-            'wecp-settings',
-            __('Settings', 'wp-event-calendar-pro'),
+            'edit.php?post_type=wecp_event',
+            __('Calendar Settings', 'wp-event-calendar-pro'),
             __('Settings', 'wp-event-calendar-pro'),
             'manage_options',
-            'wecp-settings'
-        );
-
-        add_submenu_page(
             'wecp-settings',
-            __('All Events', 'wp-event-calendar-pro'),
-            __('All Events', 'wp-event-calendar-pro'),
-            'edit_posts',
-            'edit.php?post_type=wecp_event'
-        );
-
-        add_submenu_page(
-            'wecp-settings',
-            __('Add New Event', 'wp-event-calendar-pro'),
-            __('Add New', 'wp-event-calendar-pro'),
-            'edit_posts',
-            'post-new.php?post_type=wecp_event'
-        );
-
-        add_submenu_page(
-            'wecp-settings',
-            __('Categories', 'wp-event-calendar-pro'),
-            __('Categories', 'wp-event-calendar-pro'),
-            'manage_categories',
-            'edit-tags.php?taxonomy=wecp_event_category&post_type=wecp_event'
+            array($this, 'render_settings_page')
         );
     }
 
@@ -104,7 +72,13 @@ class WECP_Admin_Settings {
             update_option('wecp_default_event_color', sanitize_hex_color($_POST['wecp_default_event_color']));
             update_option('wecp_enable_lightbox', isset($_POST['wecp_enable_lightbox']) ? '1' : '0');
             update_option('wecp_enable_booking', isset($_POST['wecp_enable_booking']) ? '1' : '0');
-            update_option('wecp_google_maps_api', sanitize_text_field($_POST['wecp_google_maps_api']));
+
+            // Map provider settings
+            update_option('wecp_map_provider', sanitize_text_field($_POST['wecp_map_provider']));
+            update_option('wecp_google_api_key', sanitize_text_field($_POST['wecp_google_api_key'] ?? ''));
+            update_option('wecp_mapbox_api_key', sanitize_text_field($_POST['wecp_mapbox_api_key'] ?? ''));
+            update_option('wecp_here_api_key', sanitize_text_field($_POST['wecp_here_api_key'] ?? ''));
+            update_option('wecp_bing_api_key', sanitize_text_field($_POST['wecp_bing_api_key'] ?? ''));
 
             echo '<div class="notice notice-success"><p>' . __('Settings saved successfully!', 'wp-event-calendar-pro') . '</p></div>';
         }
@@ -200,14 +174,81 @@ class WECP_Admin_Settings {
 
                     <tr>
                         <th scope="row">
-                            <label for="wecp_google_maps_api"><?php _e('Google Maps API Key', 'wp-event-calendar-pro'); ?></label>
+                            <label for="wecp_map_provider"><?php _e('Map Provider', 'wp-event-calendar-pro'); ?></label>
                         </th>
                         <td>
-                            <input type="text" name="wecp_google_maps_api" id="wecp_google_maps_api" value="<?php echo esc_attr($google_maps_api); ?>" class="regular-text">
+                            <?php
+                            require_once WECP_PLUGIN_DIR . 'includes/class-maps-integration.php';
+                            $providers = WECP_Maps_Integration::get_providers();
+                            $selected_provider = get_option('wecp_map_provider', 'openstreetmap');
+                            ?>
+                            <select name="wecp_map_provider" id="wecp_map_provider">
+                                <?php foreach ($providers as $key => $provider): ?>
+                                    <option value="<?php echo esc_attr($key); ?>" <?php selected($selected_provider, $key); ?>>
+                                        <?php echo esc_html($provider['name']); ?>
+                                        <?php if (!$provider['requires_key']): ?>
+                                            (<?php _e('FREE - No API Key Required', 'wp-event-calendar-pro'); ?>)
+                                        <?php endif; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                             <p class="description">
-                                <?php _e('Optional: Add Google Maps API key to display venue maps.', 'wp-event-calendar-pro'); ?>
+                                <?php _e('Choose your preferred map provider. OpenStreetMap is FREE and requires no API key!', 'wp-event-calendar-pro'); ?>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr class="wecp-api-key-row" data-provider="google" style="display: <?php echo ($selected_provider === 'google') ? 'table-row' : 'none'; ?>;">
+                        <th scope="row">
+                            <label for="wecp_google_api_key"><?php _e('Google Maps API Key', 'wp-event-calendar-pro'); ?></label>
+                        </th>
+                        <td>
+                            <input type="text" name="wecp_google_api_key" id="wecp_google_api_key" value="<?php echo esc_attr(get_option('wecp_google_api_key', '')); ?>" class="regular-text">
+                            <p class="description">
                                 <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">
-                                    <?php _e('Get API Key', 'wp-event-calendar-pro'); ?>
+                                    <?php _e('Get Google Maps API Key', 'wp-event-calendar-pro'); ?>
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr class="wecp-api-key-row" data-provider="mapbox" style="display: <?php echo ($selected_provider === 'mapbox') ? 'table-row' : 'none'; ?>;">
+                        <th scope="row">
+                            <label for="wecp_mapbox_api_key"><?php _e('Mapbox Access Token', 'wp-event-calendar-pro'); ?></label>
+                        </th>
+                        <td>
+                            <input type="text" name="wecp_mapbox_api_key" id="wecp_mapbox_api_key" value="<?php echo esc_attr(get_option('wecp_mapbox_api_key', '')); ?>" class="regular-text">
+                            <p class="description">
+                                <a href="https://account.mapbox.com/access-tokens/" target="_blank">
+                                    <?php _e('Get Mapbox Access Token (Free tier: 50,000 requests/month)', 'wp-event-calendar-pro'); ?>
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr class="wecp-api-key-row" data-provider="here" style="display: <?php echo ($selected_provider === 'here') ? 'table-row' : 'none'; ?>;">
+                        <th scope="row">
+                            <label for="wecp_here_api_key"><?php _e('HERE Maps API Key', 'wp-event-calendar-pro'); ?></label>
+                        </th>
+                        <td>
+                            <input type="text" name="wecp_here_api_key" id="wecp_here_api_key" value="<?php echo esc_attr(get_option('wecp_here_api_key', '')); ?>" class="regular-text">
+                            <p class="description">
+                                <a href="https://developer.here.com/" target="_blank">
+                                    <?php _e('Get HERE Maps API Key (Free tier: 250,000 transactions/month)', 'wp-event-calendar-pro'); ?>
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr class="wecp-api-key-row" data-provider="bing" style="display: <?php echo ($selected_provider === 'bing') ? 'table-row' : 'none'; ?>;">
+                        <th scope="row">
+                            <label for="wecp_bing_api_key"><?php _e('Bing Maps API Key', 'wp-event-calendar-pro'); ?></label>
+                        </th>
+                        <td>
+                            <input type="text" name="wecp_bing_api_key" id="wecp_bing_api_key" value="<?php echo esc_attr(get_option('wecp_bing_api_key', '')); ?>" class="regular-text">
+                            <p class="description">
+                                <a href="https://www.bingmapsportal.com/" target="_blank">
+                                    <?php _e('Get Bing Maps API Key', 'wp-event-calendar-pro'); ?>
                                 </a>
                             </p>
                         </td>

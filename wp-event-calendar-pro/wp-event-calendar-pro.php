@@ -76,6 +76,7 @@ class WP_Event_Calendar_Pro {
         require_once WECP_PLUGIN_DIR . 'includes/class-qr-code-generator.php';
         require_once WECP_PLUGIN_DIR . 'includes/class-admin-settings.php';
         require_once WECP_PLUGIN_DIR . 'includes/class-elementor-integration.php';
+        require_once WECP_PLUGIN_DIR . 'includes/class-maps-integration.php';
     }
 
     /**
@@ -97,6 +98,7 @@ class WP_Event_Calendar_Pro {
         WECP_Event_Post_Type::get_instance();
         WECP_Event_Calendar::get_instance();
         WECP_Admin_Settings::get_instance();
+        WECP_Maps_Integration::get_instance();
 
         // Initialize WooCommerce integration if WooCommerce is active
         if (class_exists('WooCommerce')) {

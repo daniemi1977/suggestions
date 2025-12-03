@@ -32,6 +32,19 @@
             const isChecked = $(this).is(':checked');
             $('#wecp_max_attendees, #wecp_ticket_price').prop('disabled', !isChecked);
         });
+
+        // Map provider toggle - Show/hide API key fields
+        $('#wecp_map_provider').on('change', function() {
+            const selectedProvider = $(this).val();
+
+            // Hide all API key rows
+            $('.wecp-api-key-row').hide();
+
+            // Show the selected provider's API key row if it needs one
+            if (selectedProvider !== 'openstreetmap') {
+                $('.wecp-api-key-row[data-provider="' + selectedProvider + '"]').show();
+            }
+        }).trigger('change'); // Trigger on page load
     });
 
 })(jQuery);
