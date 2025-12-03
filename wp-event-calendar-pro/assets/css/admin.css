@@ -1,0 +1,82 @@
+/**
+ * WP Event Calendar Pro - Admin Styles
+ */
+
+/* ============================================
+   Meta Box Styling
+   ============================================ */
+.wecp-meta-box {
+    max-width: 100%;
+}
+
+.wecp-meta-box label {
+    display: inline-block;
+    min-width: 120px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.wecp-meta-box input[type="date"],
+.wecp-meta-box input[type="time"],
+.wecp-meta-box input[type="number"],
+.wecp-meta-box input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.wecp-meta-box input[type="text"] {
+    width: 100%;
+    max-width: 400px;
+}
+
+.wecp-meta-box p {
+    margin: 15px 0;
+}
+
+.wecp-color-picker {
+    max-width: 100px;
+}
+
+/* ============================================
+   Settings Page
+   ============================================ */
+.wecp-shortcode-help {
+    background: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.wecp-shortcode-help code {
+    display: block;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+    font-size: 13px;
+    color: #d63638;
+}
+
+.wecp-shortcode-help p {
+    margin: 15px 0 5px;
+}
+
+.wecp-shortcode-help p:first-child {
+    margin-top: 0;
+}
+
+/* ============================================
+   Admin Columns
+   ============================================ */
+.wp-list-table .column-event_date,
+.wp-list-table .column-event_location,
+.wp-list-table .column-event_bookings {
+    width: 150px;
+}
+
+.wp-list-table .column-event_bookings {
+    text-align: center;
+}

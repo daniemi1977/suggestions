@@ -1,0 +1,577 @@
+/**
+ * WP Event Calendar Pro - Frontend Styles
+ * Inspired by EventON's beautiful, minimal design
+ */
+
+/* ============================================
+   Calendar Wrapper
+   ============================================ */
+.wecp-calendar-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px 0;
+}
+
+/* ============================================
+   Calendar Header
+   ============================================ */
+.wecp-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.wecp-calendar-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.wecp-nav-prev,
+.wecp-nav-next {
+    background: #f8f9fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wecp-nav-prev:hover,
+.wecp-nav-next:hover {
+    background: #3498db;
+    color: #ffffff;
+    border-color: #3498db;
+}
+
+.wecp-nav-prev .dashicons,
+.wecp-nav-next .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+/* ============================================
+   Calendar Grid
+   ============================================ */
+.wecp-calendar-grid {
+    width: 100%;
+}
+
+.wecp-calendar-head {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 2px;
+}
+
+.wecp-calendar-day-name {
+    background: #f8f9fa;
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.wecp-calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.wecp-calendar-cell {
+    background: #ffffff;
+    border: 1px solid #e1e4e8;
+    min-height: 100px;
+    padding: 8px;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.wecp-calendar-cell:hover {
+    background: #f8f9fa;
+    border-color: #3498db;
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+}
+
+.wecp-calendar-cell.wecp-empty {
+    background: #fafafa;
+    cursor: default;
+}
+
+.wecp-calendar-cell.wecp-empty:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #e1e4e8;
+}
+
+.wecp-calendar-cell.wecp-today {
+    background: #e3f2fd;
+    border-color: #2196f3;
+}
+
+.wecp-calendar-cell.wecp-has-events {
+    background: #fff8e1;
+}
+
+.wecp-cell-date {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.wecp-today .wecp-cell-date {
+    color: #2196f3;
+}
+
+.wecp-cell-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.wecp-event-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.wecp-event-dot:hover {
+    transform: scale(1.5);
+}
+
+/* ============================================
+   Event Cards
+   ============================================ */
+.wecp-event-card {
+    background: #ffffff;
+    border-left: 4px solid #3498db;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.wecp-event-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.wecp-layout-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+}
+
+.wecp-layout-tile {
+    display: flex;
+    flex-direction: column;
+}
+
+.wecp-event-thumbnail {
+    overflow: hidden;
+}
+
+.wecp-layout-list .wecp-event-thumbnail {
+    width: 200px;
+    height: 200px;
+}
+
+.wecp-layout-tile .wecp-event-thumbnail {
+    width: 100%;
+    height: 200px;
+}
+
+.wecp-event-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.wecp-event-card:hover .wecp-event-thumbnail img {
+    transform: scale(1.1);
+}
+
+.wecp-event-content {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+}
+
+.wecp-event-date {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    min-width: 60px;
+    height: fit-content;
+}
+
+.wecp-date-day {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.wecp-date-month {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.wecp-event-details {
+    flex: 1;
+}
+
+.wecp-event-title {
+    margin: 0 0 12px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.wecp-event-time,
+.wecp-event-venue {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #6c757d;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.wecp-event-time .dashicons,
+.wecp-event-venue .dashicons {
+    color: #3498db;
+}
+
+.wecp-event-excerpt {
+    color: #495057;
+    line-height: 1.6;
+    margin: 12px 0;
+}
+
+.wecp-event-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* ============================================
+   Buttons
+   ============================================ */
+.wecp-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.wecp-btn-details {
+    background: #f8f9fa;
+    color: #2c3e50;
+    border: 1px solid #e1e4e8;
+}
+
+.wecp-btn-details:hover {
+    background: #e9ecef;
+    border-color: #cbd3da;
+}
+
+.wecp-btn-book {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+}
+
+.wecp-btn-book:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+}
+
+.wecp-btn-book-large {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    padding: 15px 40px;
+    font-size: 16px;
+    width: 100%;
+    border-radius: 6px;
+}
+
+/* ============================================
+   Tile View
+   ============================================ */
+.wecp-events-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.wecp-events-tiles[data-columns="2"] {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.wecp-events-tiles[data-columns="3"] {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.wecp-events-tiles[data-columns="4"] {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* ============================================
+   Lightbox
+   ============================================ */
+.wecp-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wecp-lightbox-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.wecp-lightbox-content {
+    position: relative;
+    background: #ffffff;
+    border-radius: 12px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: wecp-fade-in 0.3s ease;
+}
+
+@keyframes wecp-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.wecp-lightbox-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.wecp-lightbox-close:hover {
+    background: #e74c3c;
+    color: #ffffff;
+    transform: rotate(90deg);
+}
+
+.wecp-lightbox-body {
+    padding: 30px;
+}
+
+.wecp-event-details-modal h2 {
+    margin: 0 0 20px;
+    font-size: 28px;
+    color: #2c3e50;
+}
+
+.wecp-modal-image {
+    margin: -30px -30px 20px;
+    overflow: hidden;
+}
+
+.wecp-modal-image img {
+    width: 100%;
+    height: auto;
+}
+
+.wecp-modal-meta {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.wecp-meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+
+.wecp-meta-item:last-child {
+    margin-bottom: 0;
+}
+
+.wecp-meta-item .dashicons {
+    color: #3498db;
+    margin-top: 2px;
+}
+
+.wecp-modal-content {
+    line-height: 1.8;
+    color: #495057;
+    margin: 20px 0;
+}
+
+.wecp-modal-booking {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f0f0;
+}
+
+/* ============================================
+   Ticket Scanner
+   ============================================ */
+.wecp-ticket-scanner {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.wecp-ticket-scanner h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.scanner-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#wecp-ticket-input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e1e4e8;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#wecp-ticket-input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+    .wecp-calendar-body {
+        gap: 1px;
+    }
+
+    .wecp-calendar-cell {
+        min-height: 80px;
+        padding: 4px;
+    }
+
+    .wecp-cell-date {
+        font-size: 14px;
+    }
+
+    .wecp-calendar-day-name {
+        font-size: 12px;
+        padding: 8px 4px;
+    }
+
+    .wecp-layout-list {
+        grid-template-columns: 1fr;
+    }
+
+    .wecp-layout-list .wecp-event-thumbnail {
+        width: 100%;
+        height: 200px;
+    }
+
+    .wecp-event-content {
+        flex-direction: column;
+    }
+
+    .wecp-events-tiles[data-columns="2"],
+    .wecp-events-tiles[data-columns="3"],
+    .wecp-events-tiles[data-columns="4"] {
+        grid-template-columns: 1fr;
+    }
+
+    .wecp-lightbox-content {
+        max-width: 95%;
+        margin: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wecp-calendar-wrapper {
+        padding: 10px;
+    }
+
+    .wecp-calendar-title {
+        font-size: 18px;
+    }
+
+    .wecp-calendar-cell {
+        min-height: 60px;
+    }
+
+    .wecp-event-actions {
+        flex-direction: column;
+    }
+
+    .wecp-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
