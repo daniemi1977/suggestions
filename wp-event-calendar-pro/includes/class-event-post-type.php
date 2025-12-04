@@ -35,8 +35,9 @@ class WECP_Event_Post_Type {
      */
     public function register_post_type() {
         $labels = array(
-            'name' => __('Events', 'wp-event-calendar-pro'),
+            'name' => __('Events Calendar', 'wp-event-calendar-pro'),
             'singular_name' => __('Event', 'wp-event-calendar-pro'),
+            'menu_name' => __('Events Calendar', 'wp-event-calendar-pro'),
             'add_new' => __('Add New Event', 'wp-event-calendar-pro'),
             'add_new_item' => __('Add New Event', 'wp-event-calendar-pro'),
             'edit_item' => __('Edit Event', 'wp-event-calendar-pro'),
