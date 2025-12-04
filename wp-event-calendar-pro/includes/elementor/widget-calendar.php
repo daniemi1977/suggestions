@@ -69,9 +69,12 @@ class WECP_Elementor_Calendar_Widget extends \Elementor\Widget_Base {
                 'options' => array(
                     'month' => __('Month View', 'wp-event-calendar-pro'),
                     'week' => __('Week View', 'wp-event-calendar-pro'),
+                    'day' => __('Day View', 'wp-event-calendar-pro'),
+                    'agenda' => __('Agenda View', 'wp-event-calendar-pro'),
                     'list' => __('List View', 'wp-event-calendar-pro'),
                     'tile' => __('Tile View', 'wp-event-calendar-pro'),
                 ),
+                'description' => __('Choose how events are displayed. Week/Day/Agenda views show more detailed scheduling.', 'wp-event-calendar-pro'),
             )
         );
 

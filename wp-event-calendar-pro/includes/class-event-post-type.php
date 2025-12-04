@@ -125,6 +125,9 @@ class WECP_Event_Post_Type {
             'high'
         );
 
+        // Add recurring events meta box
+        WECP_Recurring_Events::get_instance()->add_recurrence_meta_box();
+
         add_meta_box(
             'wecp_event_location',
             __('Event Location', 'wp-event-calendar-pro'),

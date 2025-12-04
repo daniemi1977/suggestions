@@ -91,27 +91,65 @@ class WECP_Event_Calendar {
      * Render calendar view
      */
     private function render_calendar($atts) {
+        $view = $atts['view'];
         $current_month = isset($_GET['month']) ? intval($_GET['month']) : date('n');
         $current_year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
+        $current_week = isset($_GET['week']) ? intval($_GET['week']) : date('W');
+        $current_day = isset($_GET['day']) ? sanitize_text_field($_GET['day']) : date('Y-m-d');
 
         ?>
-        <div class="wecp-calendar-wrapper" data-view="<?php echo esc_attr($atts['view']); ?>" data-interaction="<?php echo esc_attr($atts['interaction']); ?>">
-            <!-- Calendar Header -->
-            <div class="wecp-calendar-header">
-                <button class="wecp-nav-prev" data-month="<?php echo $current_month; ?>" data-year="<?php echo $current_year; ?>">
-                    <span class="dashicons dashicons-arrow-left-alt2"></span>
+        <div class="wecp-calendar-wrapper wecp-view-<?php echo esc_attr($view); ?>" data-view="<?php echo esc_attr($view); ?>" data-interaction="<?php echo esc_attr($atts['interaction']); ?>">
+            <!-- View Switcher -->
+            <div class="wecp-view-switcher">
+                <button class="wecp-view-btn <?php echo $view === 'month' ? 'active' : ''; ?>" data-view="month">
+                    <?php _e('Month', 'wp-event-calendar-pro'); ?>
                 </button>
-                <h2 class="wecp-calendar-title">
-                    <span class="month-name"><?php echo date_i18n('F Y', mktime(0, 0, 0, $current_month, 1, $current_year)); ?></span>
-                </h2>
-                <button class="wecp-nav-next" data-month="<?php echo $current_month; ?>" data-year="<?php echo $current_year; ?>">
-                    <span class="dashicons dashicons-arrow-right-alt2"></span>
+                <button class="wecp-view-btn <?php echo $view === 'week' ? 'active' : ''; ?>" data-view="week">
+                    <?php _e('Week', 'wp-event-calendar-pro'); ?>
+                </button>
+                <button class="wecp-view-btn <?php echo $view === 'day' ? 'active' : ''; ?>" data-view="day">
+                    <?php _e('Day', 'wp-event-calendar-pro'); ?>
+                </button>
+                <button class="wecp-view-btn <?php echo $view === 'agenda' ? 'active' : ''; ?>" data-view="agenda">
+                    <?php _e('Agenda', 'wp-event-calendar-pro'); ?>
                 </button>
             </div>
 
-            <!-- Calendar Grid -->
-            <div class="wecp-calendar-grid">
-                <?php $this->render_calendar_grid($current_month, $current_year, $atts); ?>
+            <!-- Calendar Header -->
+            <div class="wecp-calendar-header">
+                <button class="wecp-nav-prev" data-view="<?php echo esc_attr($view); ?>" data-month="<?php echo $current_month; ?>" data-year="<?php echo $current_year; ?>" data-week="<?php echo $current_week; ?>" data-day="<?php echo esc_attr($current_day); ?>">
+                    <span class="dashicons dashicons-arrow-left-alt2"></span>
+                </button>
+                <h2 class="wecp-calendar-title">
+                    <?php $this->render_calendar_title($view, $current_month, $current_year, $current_week, $current_day); ?>
+                </h2>
+                <button class="wecp-nav-next" data-view="<?php echo esc_attr($view); ?>" data-month="<?php echo $current_month; ?>" data-year="<?php echo $current_year; ?>" data-week="<?php echo $current_week; ?>" data-day="<?php echo esc_attr($current_day); ?>">
+                    <span class="dashicons dashicons-arrow-right-alt2"></span>
+                </button>
+                <button class="wecp-today-btn" title="<?php esc_attr_e('Go to Today', 'wp-event-calendar-pro'); ?>">
+                    <?php _e('Today', 'wp-event-calendar-pro'); ?>
+                </button>
+            </div>
+
+            <!-- Calendar Content -->
+            <div class="wecp-calendar-content">
+                <?php
+                switch ($view) {
+                    case 'week':
+                        $this->render_week_view($current_week, $current_year, $atts);
+                        break;
+                    case 'day':
+                        $this->render_day_view($current_day, $atts);
+                        break;
+                    case 'agenda':
+                        $this->render_agenda_view($current_month, $current_year, $atts);
+                        break;
+                    case 'month':
+                    default:
+                        $this->render_calendar_grid($current_month, $current_year, $atts);
+                        break;
+                }
+                ?>
             </div>
 
             <!-- Event Lightbox -->
@@ -124,6 +162,49 @@ class WECP_Event_Calendar {
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * Render calendar title based on view
+     */
+    private function render_calendar_title($view, $month, $year, $week, $day) {
+        switch ($view) {
+            case 'week':
+                $week_start = new DateTime();
+                $week_start->setISODate($year, $week);
+                $week_end = clone $week_start;
+                $week_end->modify('+6 days');
+
+                printf(
+                    '<span class="week-range">%s - %s</span>',
+                    $week_start->format('M j'),
+                    $week_end->format('M j, Y')
+                );
+                break;
+
+            case 'day':
+                $day_obj = new DateTime($day);
+                printf(
+                    '<span class="day-title">%s</span>',
+                    $day_obj->format('l, F j, Y')
+                );
+                break;
+
+            case 'agenda':
+                printf(
+                    '<span class="agenda-title">%s</span>',
+                    date_i18n('F Y', mktime(0, 0, 0, $month, 1, $year))
+                );
+                break;
+
+            case 'month':
+            default:
+                printf(
+                    '<span class="month-name">%s</span>',
+                    date_i18n('F Y', mktime(0, 0, 0, $month, 1, $year))
+                );
+                break;
+        }
     }
 
     /**
@@ -200,6 +281,353 @@ class WECP_Event_Calendar {
             ?>
         </div>
         <?php
+    }
+
+    /**
+     * Render week view
+     */
+    private function render_week_view($week, $year, $atts) {
+        $week_start = new DateTime();
+        $week_start->setISODate($year, $week);
+
+        $day_names = array(
+            __('Sunday', 'wp-event-calendar-pro'),
+            __('Monday', 'wp-event-calendar-pro'),
+            __('Tuesday', 'wp-event-calendar-pro'),
+            __('Wednesday', 'wp-event-calendar-pro'),
+            __('Thursday', 'wp-event-calendar-pro'),
+            __('Friday', 'wp-event-calendar-pro'),
+            __('Saturday', 'wp-event-calendar-pro'),
+        );
+
+        ?>
+        <div class="wecp-week-view">
+            <!-- Time column labels -->
+            <div class="wecp-week-header">
+                <div class="wecp-time-col-label"></div>
+                <?php
+                for ($i = 0; $i < 7; $i++) {
+                    $day = clone $week_start;
+                    $day->modify("+{$i} days");
+                    $is_today = ($day->format('Y-m-d') === date('Y-m-d'));
+                    ?>
+                    <div class="wecp-week-day-header <?php echo $is_today ? 'wecp-today' : ''; ?>">
+                        <div class="wecp-day-name"><?php echo esc_html($day_names[$day->format('w')]); ?></div>
+                        <div class="wecp-day-date"><?php echo $day->format('j'); ?></div>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+
+            <!-- Week grid with time slots -->
+            <div class="wecp-week-grid">
+                <?php
+                // Get events for this week
+                $week_events = array();
+                for ($i = 0; $i < 7; $i++) {
+                    $day = clone $week_start;
+                    $day->modify("+{$i} days");
+                    $date = $day->format('Y-m-d');
+                    $day_events = $this->get_events_for_date($date, $atts);
+                    $week_events[$date] = $day_events;
+                }
+
+                // Render time slots (24 hours)
+                for ($hour = 0; $hour < 24; $hour++) {
+                    ?>
+                    <div class="wecp-week-row" data-hour="<?php echo $hour; ?>">
+                        <div class="wecp-time-label">
+                            <?php echo sprintf('%02d:00', $hour); ?>
+                        </div>
+                        <?php
+                        for ($i = 0; $i < 7; $i++) {
+                            $day = clone $week_start;
+                            $day->modify("+{$i} days");
+                            $date = $day->format('Y-m-d');
+                            $is_today = ($date === date('Y-m-d'));
+
+                            // Filter events for this hour
+                            $hour_events = array();
+                            if (!empty($week_events[$date])) {
+                                foreach ($week_events[$date] as $event) {
+                                    $start_time = get_post_meta($event->ID, '_wecp_start_time', true);
+                                    if ($start_time) {
+                                        $event_hour = intval(substr($start_time, 0, 2));
+                                        if ($event_hour === $hour) {
+                                            $hour_events[] = $event;
+                                        }
+                                    }
+                                }
+                            }
+
+                            $classes = array('wecp-week-cell');
+                            if ($is_today) $classes[] = 'wecp-today';
+                            if (!empty($hour_events)) $classes[] = 'wecp-has-events';
+                            ?>
+                            <div class="<?php echo esc_attr(implode(' ', $classes)); ?>" data-date="<?php echo esc_attr($date); ?>" data-hour="<?php echo $hour; ?>">
+                                <?php
+                                foreach ($hour_events as $event) {
+                                    $color = get_post_meta($event->ID, '_wecp_event_color', true) ?: '#3498db';
+                                    $start_time = get_post_meta($event->ID, '_wecp_start_time', true);
+                                    ?>
+                                    <div class="wecp-week-event" style="border-left-color: <?php echo esc_attr($color); ?>;" data-event-id="<?php echo esc_attr($event->ID); ?>" title="<?php echo esc_attr($event->post_title); ?>">
+                                        <div class="wecp-event-time"><?php echo esc_html($start_time); ?></div>
+                                        <div class="wecp-event-title"><?php echo esc_html($event->post_title); ?></div>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render day view
+     */
+    private function render_day_view($date, $atts) {
+        $day = new DateTime($date);
+        $events = $this->get_events_for_date($date, $atts);
+
+        ?>
+        <div class="wecp-day-view">
+            <!-- Time slots for the day -->
+            <div class="wecp-day-timeline">
+                <?php
+                for ($hour = 0; $hour < 24; $hour++) {
+                    // Filter events for this hour
+                    $hour_events = array();
+                    foreach ($events as $event) {
+                        $start_time = get_post_meta($event->ID, '_wecp_start_time', true);
+                        $all_day = get_post_meta($event->ID, '_wecp_all_day', true);
+
+                        if ($all_day) {
+                            // All-day events go in hour 0
+                            if ($hour === 0) {
+                                $hour_events[] = $event;
+                            }
+                        } elseif ($start_time) {
+                            $event_hour = intval(substr($start_time, 0, 2));
+                            if ($event_hour === $hour) {
+                                $hour_events[] = $event;
+                            }
+                        }
+                    }
+
+                    $has_events = !empty($hour_events);
+                    ?>
+                    <div class="wecp-day-hour <?php echo $has_events ? 'wecp-has-events' : ''; ?>" data-hour="<?php echo $hour; ?>">
+                        <div class="wecp-hour-label">
+                            <?php echo sprintf('%02d:00', $hour); ?>
+                        </div>
+                        <div class="wecp-hour-events">
+                            <?php
+                            foreach ($hour_events as $event) {
+                                $color = get_post_meta($event->ID, '_wecp_event_color', true) ?: '#3498db';
+                                $start_time = get_post_meta($event->ID, '_wecp_start_time', true);
+                                $end_time = get_post_meta($event->ID, '_wecp_end_time', true);
+                                $venue = get_post_meta($event->ID, '_wecp_venue_name', true);
+                                $all_day = get_post_meta($event->ID, '_wecp_all_day', true);
+                                ?>
+                                <div class="wecp-day-event" style="border-left-color: <?php echo esc_attr($color); ?>;" data-event-id="<?php echo esc_attr($event->ID); ?>">
+                                    <div class="wecp-event-time">
+                                        <?php
+                                        if ($all_day) {
+                                            _e('All Day', 'wp-event-calendar-pro');
+                                        } else {
+                                            echo esc_html($start_time);
+                                            if ($end_time) {
+                                                echo ' - ' . esc_html($end_time);
+                                            }
+                                        }
+                                        ?>
+                                    </div>
+                                    <div class="wecp-event-title"><?php echo esc_html($event->post_title); ?></div>
+                                    <?php if ($venue): ?>
+                                        <div class="wecp-event-venue">
+                                            <span class="dashicons dashicons-location"></span>
+                                            <?php echo esc_html($venue); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+
+            <?php if (empty($events)): ?>
+                <div class="wecp-no-events">
+                    <p><?php _e('No events scheduled for this day.', 'wp-event-calendar-pro'); ?></p>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render agenda view (list of upcoming events)
+     */
+    private function render_agenda_view($month, $year, $atts) {
+        // Get all events for the month, grouped by date
+        $events = $this->get_events_for_month($month, $year, $atts);
+
+        if (empty($events)) {
+            echo '<div class="wecp-no-events"><p>' . __('No events found for this month.', 'wp-event-calendar-pro') . '</p></div>';
+            return;
+        }
+
+        // Sort events by date
+        ksort($events);
+
+        ?>
+        <div class="wecp-agenda-view">
+            <?php
+            foreach ($events as $date => $day_events) {
+                $day = new DateTime($date);
+                $is_today = ($date === date('Y-m-d'));
+                ?>
+                <div class="wecp-agenda-date <?php echo $is_today ? 'wecp-today' : ''; ?>" data-date="<?php echo esc_attr($date); ?>">
+                    <div class="wecp-agenda-date-header">
+                        <div class="wecp-agenda-day-number"><?php echo $day->format('j'); ?></div>
+                        <div class="wecp-agenda-day-info">
+                            <div class="wecp-agenda-day-name"><?php echo $day->format('l'); ?></div>
+                            <div class="wecp-agenda-month-name"><?php echo $day->format('F Y'); ?></div>
+                        </div>
+                        <div class="wecp-agenda-event-count">
+                            <?php printf(_n('%d event', '%d events', count($day_events), 'wp-event-calendar-pro'), count($day_events)); ?>
+                        </div>
+                    </div>
+
+                    <div class="wecp-agenda-events">
+                        <?php foreach ($day_events as $event):
+                            $color = get_post_meta($event->ID, '_wecp_event_color', true) ?: '#3498db';
+                            $start_time = get_post_meta($event->ID, '_wecp_start_time', true);
+                            $end_time = get_post_meta($event->ID, '_wecp_end_time', true);
+                            $all_day = get_post_meta($event->ID, '_wecp_all_day', true);
+                            $venue = get_post_meta($event->ID, '_wecp_venue_name', true);
+                            $categories = wp_get_post_terms($event->ID, 'wecp_event_category');
+                            ?>
+                            <div class="wecp-agenda-event" style="border-left-color: <?php echo esc_attr($color); ?>;" data-event-id="<?php echo esc_attr($event->ID); ?>">
+                                <div class="wecp-agenda-event-time">
+                                    <?php
+                                    if ($all_day) {
+                                        _e('All Day', 'wp-event-calendar-pro');
+                                    } else {
+                                        echo esc_html($start_time);
+                                        if ($end_time) {
+                                            echo ' - ' . esc_html($end_time);
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                                <div class="wecp-agenda-event-content">
+                                    <h3 class="wecp-agenda-event-title"><?php echo esc_html($event->post_title); ?></h3>
+
+                                    <?php if (!empty($categories)): ?>
+                                        <div class="wecp-agenda-event-categories">
+                                            <?php foreach ($categories as $cat): ?>
+                                                <span class="wecp-event-category"><?php echo esc_html($cat->name); ?></span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if ($venue): ?>
+                                        <div class="wecp-agenda-event-venue">
+                                            <span class="dashicons dashicons-location"></span>
+                                            <?php echo esc_html($venue); ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if ($event->post_excerpt): ?>
+                                        <div class="wecp-agenda-event-excerpt">
+                                            <?php echo esc_html($event->post_excerpt); ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="wecp-agenda-event-actions">
+                                        <button class="wecp-event-details-btn" data-event-id="<?php echo esc_attr($event->ID); ?>">
+                                            <?php _e('View Details', 'wp-event-calendar-pro'); ?>
+                                        </button>
+
+                                        <?php
+                                        // Check if booking is enabled
+                                        $enable_booking = get_post_meta($event->ID, '_wecp_enable_booking', true);
+                                        if ($enable_booking && class_exists('WooCommerce')) {
+                                            $product_id = get_post_meta($event->ID, '_wecp_product_id', true);
+                                            if ($product_id) {
+                                                $product = wc_get_product($product_id);
+                                                if ($product && $product->is_in_stock()) {
+                                                    ?>
+                                                    <button class="wecp-book-btn" data-product-id="<?php echo esc_attr($product_id); ?>">
+                                                        <?php _e('Book Now', 'wp-event-calendar-pro'); ?>
+                                                    </button>
+                                                    <?php
+                                                } else {
+                                                    ?>
+                                                    <span class="wecp-sold-out"><?php _e('Sold Out', 'wp-event-calendar-pro'); ?></span>
+                                                    <?php
+                                                }
+                                            }
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Get events for a specific date
+     */
+    private function get_events_for_date($date, $atts) {
+        $args = array(
+            'post_type' => 'wecp_event',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'meta_query' => array(
+                array(
+                    'key' => '_wecp_start_date',
+                    'value' => $date,
+                    'compare' => '=',
+                    'type' => 'DATE',
+                ),
+            ),
+        );
+
+        // Add category filter
+        if (!empty($atts['category'])) {
+            $args['tax_query'] = array(
+                array(
+                    'taxonomy' => 'wecp_event_category',
+                    'field' => 'slug',
+                    'terms' => $atts['category'],
+                ),
+            );
+        }
+
+        $query = new WP_Query($args);
+        return $query->posts;
     }
 
     /**

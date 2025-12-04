@@ -1,5 +1,7 @@
 # WP Event Calendar Pro
 
+**Version 1.5.0** - Professional Event Calendar & Booking System
+
 Un plugin WordPress elegante e moderno per la gestione di calendari eventi con sistema di prenotazione integrato WooCommerce. Ispirato a EventON con un design pulito e minimalista.
 
 ## 🎨 Caratteristiche Principali
@@ -7,13 +9,20 @@ Un plugin WordPress elegante e moderno per la gestione di calendari eventi con s
 ### Design & UX
 - **Design Ispirato a EventON**: Interfaccia pulita, minimalista e professionale
 - **Lightbox Popup**: Visualizzazione dettagli eventi in finestra modale elegante
-- **Vista Multipla**: Mese, Lista, e Tile view
+- **✨ 4 Viste Calendario**: Month, Week, Day, and Agenda views
+- **Advanced Filters**: Search, filter by category, date range, location, and price
 - **Completamente Responsive**: Ottimizzato per desktop, tablet e mobile
 - **Color-Coded Events**: Eventi personalizzabili con colori per categoria
 - **Animazioni Fluide**: Transizioni smooth e microinterazioni
 
 ### Gestione Eventi
 - **Custom Post Type**: Eventi come tipo di contenuto dedicato
+- **✨ Recurring Events**: Create repeating events with flexible patterns
+  - Daily, Weekly, Monthly, Yearly patterns
+  - Custom weekday selection (e.g., every Tuesday and Thursday)
+  - Monthly options (specific date or weekday, e.g., "2nd Tuesday of month")
+  - Flexible end dates (never, specific date, or after X occurrences)
+  - Automatic instance generation
 - **Campi Evento Completi**:
   - Data e ora inizio/fine
   - Eventi giornata intera
@@ -33,9 +42,20 @@ Un plugin WordPress elegante e moderno per la gestione di calendari eventi con s
 - ✅ **Email Automatiche**: Conferme ordine con dettagli evento
 
 ### Funzionalità Avanzate
+- **✨ Advanced Event Filters**: Comprehensive filtering system
+  - Keyword search across event titles and descriptions
+  - Filter by category with event counts
+  - Date range selector with quick presets (Today, This Week, This Month)
+  - Location filters (City, State)
+  - Price range filters with quick price brackets
+  - Real-time AJAX filtering without page reload
+  - Active filter tags with remove option
+  - Multiple sort options (Date, Title, Price)
+  - Available as shortcode [wecp_event_filters] or sidebar widget
 - **Scanner Biglietti**: Sistema di verifica QR code per check-in
 - **AJAX Loading**: Caricamento veloce senza refresh pagina
 - **Shortcode Potenti**: Sistema shortcode flessibile e personalizzabile
+- **5 Map Providers**: OpenStreetMap (FREE), Google Maps, Mapbox, HERE, Bing
 - **Multilingua Ready**: Compatibile con WPML e Polylang
 - **Developer Friendly**: Hooks e filtri per personalizzazioni
 
@@ -375,6 +395,31 @@ Crea un file CSS nel tuo tema:
 - Controlla log errori PHP
 
 ## 📝 Changelog
+
+### Version 1.5.0 (Major Update - MVP Competitive Release)
+- 🚀 **NEW: Recurring Events System**
+  - Daily, Weekly, Monthly, Yearly recurrence patterns
+  - Custom weekday selection (e.g., every Tuesday and Thursday)
+  - Monthly patterns (specific date or weekday)
+  - Flexible end options (never, date, or occurrence count)
+  - Automatic instance generation for repeating events
+- 🚀 **NEW: Additional Calendar Views**
+  - Week View with hourly time slots
+  - Day View with detailed scheduling
+  - Agenda View with rich event details
+  - Month View (existing, enhanced)
+- 🚀 **NEW: Advanced Filter System**
+  - Keyword search across events
+  - Category filtering with event counts
+  - Date range filtering with quick presets
+  - Location filters (City, State)
+  - Price range filtering with quick brackets
+  - Real-time AJAX results without page reload
+  - Available as shortcode and sidebar widget
+  - Multiple sort options (Date, Title, Price)
+- ✨ Enhanced Elementor widgets with new views support
+- ✨ Updated plugin to version 1.5.0
+- 🐛 Bug fixes and performance improvements
 
 ### Version 1.0.0
 - ✨ Release iniziale

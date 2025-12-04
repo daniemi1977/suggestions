@@ -3,7 +3,7 @@
  * Plugin Name: WP Event Calendar Pro
  * Plugin URI: https://github.com/daniemi1977/wp-event-calendar-pro
  * Description: Beautiful event calendar with WooCommerce booking integration. Inspired by EventON with modern design.
- * Version: 1.0.0
+ * Version: 1.5.0
  * Author: Your Name
  * Author URI: https://github.com/daniemi1977
  * Text Domain: wp-event-calendar-pro
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('WECP_VERSION', '1.0.0');
+define('WECP_VERSION', '1.5.0');
 define('WECP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WECP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WECP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -77,6 +77,8 @@ class WP_Event_Calendar_Pro {
         require_once WECP_PLUGIN_DIR . 'includes/class-admin-settings.php';
         require_once WECP_PLUGIN_DIR . 'includes/class-elementor-integration.php';
         require_once WECP_PLUGIN_DIR . 'includes/class-maps-integration.php';
+        require_once WECP_PLUGIN_DIR . 'includes/class-recurring-events.php';
+        require_once WECP_PLUGIN_DIR . 'includes/class-event-filters.php';
     }
 
     /**
@@ -99,6 +101,8 @@ class WP_Event_Calendar_Pro {
         WECP_Event_Calendar::get_instance();
         WECP_Admin_Settings::get_instance();
         WECP_Maps_Integration::get_instance();
+        WECP_Recurring_Events::get_instance();
+        WECP_Event_Filters::get_instance();
 
         // Initialize WooCommerce integration if WooCommerce is active
         if (class_exists('WooCommerce')) {
